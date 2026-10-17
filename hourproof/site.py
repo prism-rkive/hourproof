@@ -70,6 +70,11 @@ def export(evidence=EVIDENCE, out=SNAPSHOT_DIR) -> dict:
     overview["running"] = False
     out.mkdir(parents=True, exist_ok=True)
     files = {"overview.json": overview, "week.json": week, "carbon.json": carbon}
+    console = evidence / "console.txt"  # the run's own console output, secret-scanned before it was committed
+    if console.exists():
+        files["log.json"] = {"recorded": True, "run_id": state["run_id"], "running": False,
+                             "source": f"evidence/base-sepolia-{VERIFIED_RUN}/console.txt",
+                             "log": console.read_text(encoding="utf-8")}
     for name, data in files.items():
         (out / name).write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
     return {name: (out / name).stat().st_size for name in files}

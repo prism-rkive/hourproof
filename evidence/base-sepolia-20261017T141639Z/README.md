@@ -140,10 +140,13 @@ make verify-evidence    # both
 
 ## Files (SHA-256)
 
-Byte-identical copies of `data/runs/20261017T141639Z/` (which stays git-ignored locally). The state file was written with every signing key scrubbed; a scan for the admin key and all derived keys finds none.
+Apart from `console.txt`, byte-identical copies of `data/runs/20261017T141639Z/` (which stays git-ignored locally). The state file was written with every signing key scrubbed; a scan for the admin key and all derived keys finds none.
+
+`console.txt` is the run's console output, verbatim from the first line (the command) to the last (`DEMO_BASE_EXIT=0`, the exit status recorded by the wrapper that ran it). Before it was committed it was scanned for the admin key, every derived role key, every `.env` value, the issuers' ML-DSA secret keys, and any 32-byte hex value that is not already public in `state.json`: none found.
 
 | File | SHA-256 |
 |---|---|
+| `console.txt` | `eb8cee74584bb75546f21482cd4c2d042865102ad1202e6561a2543e2b986884` |
 | `independent-checks.txt` | `b5745d25225fbddd9c0f0ae1766803bd6818ce9bf1fcf1cae9f1f26d49358ce2` |
 | `plans/2025-11-10.json` | `f92cf87d2580e37bd2f94b3cacb41db8cb06948b704fdf8aeb00329b55cf6950` |
 | `plans/2025-11-11.json` | `0c1e09ca324cd23b27c388fd729699f3b8d1ec2e14c60ebc0b2222be2518a8e6` |

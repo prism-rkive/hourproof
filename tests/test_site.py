@@ -1,5 +1,6 @@
 """The static dashboard (Vercel): config, committed snapshot, exporter guards and the build script."""
 import csv
+import hashlib
 import json
 import re
 import shutil
@@ -66,6 +67,28 @@ class SnapshotTests(unittest.TestCase):
         self.assertGreater(m["notes_subscribed"], 0)
         self.assertIn(o["demo"]["contracts"]["SustainabilityLinkedNote"]["address"], m["notes_subscribed_source"])
         self.assertIn("totalSupply()", m["notes_subscribed_source"])
+
+    def test_recorded_log_is_the_run_console_verbatim(self):
+        console = (site.EVIDENCE / "console.txt").read_text(encoding="utf-8")
+        log = json.loads((SNAP / "log.json").read_text())
+        self.assertEqual((log["recorded"], log["running"], log["run_id"]), (True, False, site.VERIFIED_RUN))
+        self.assertEqual(log["log"], console)  # every byte, first line (the command) to last (the exit status)
+        self.assertTrue(console.splitlines()[0].endswith("-m hourproof demo --network base-sepolia"))
+        self.assertEqual(console.splitlines()[-1], "DEMO_BASE_EXIT=0")
+        summary = json.loads((SNAP / "overview.json").read_text())["demo"]["summary"]
+        for key in ("transactions", "gas_total", "attacks_blocked", "proven_residual_kg"):
+            self.assertRegex(console, rf'"{key}": {summary[key]}\b')  # the log is this run's log
+
+    def test_console_hash_is_recorded_in_the_evidence_readme(self):
+        digest = hashlib.sha256((site.EVIDENCE / "console.txt").read_bytes()).hexdigest()
+        self.assertIn(f"| `console.txt` | `{digest}` |", (site.EVIDENCE / "README.md").read_text(encoding="utf-8"))
+
+    def test_note_count_is_stored_in_the_snapshot_with_its_source(self):
+        # The hosted page shows the note count from this file; it never calls the chain.
+        o = json.loads((SNAP / "overview.json").read_text())
+        m = next(s for s in o["demo"]["steps"] if s["id"] == "note")["metrics"]
+        self.assertEqual(m["notes_subscribed"], 1000)
+        self.assertIn("SustainabilityLinkedNote", m["notes_subscribed_source"])
 
     def test_carbon_test_period_is_jul_to_dec_2025(self):  # the "What this does not claim" text names this period
         start, end = json.loads((SNAP / "carbon.json").read_text())["test_period"]
