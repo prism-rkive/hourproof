@@ -1,4 +1,5 @@
 {
+ "annual_match": 1.0,
  "backtest": {
   "agent": "hourproof-agent-v1",
   "budget": {
@@ -1685,6 +1686,8 @@
      "gas_total": 514838,
      "kpi": "RESIDUAL_EMISSIONS",
      "kpi_met": false,
+     "notes_subscribed": 1000.0,
+     "notes_subscribed_source": "totalSupply() of SustainabilityLinkedNote 0xc084E6cE004966E243a745d7b0adf108BD6B38b4 on Base Sepolia, in units of TestUSD decimals() = 18, read when the snapshot was exported",
      "proven_residual_kg": 546125,
      "target_bps": 7500,
      "target_residual_kg": 428509
@@ -3901,7 +3904,7 @@
  "running": false,
  "static_snapshot": {
   "evidence": "evidence/base-sepolia-20261017T141639Z/",
-  "exported_utc": "2026-10-17T17:09:07+00:00",
+  "exported_utc": "2026-10-17T21:28:09+00:00",
   "network": "base-sepolia",
   "run_id": "20261017T141639Z",
   "verification": "re-verified on-chain: VERIFIED: run 20261017T141639Z on base-sepolia (80 transactions)"

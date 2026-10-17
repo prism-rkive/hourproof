@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import functools
 import io
 import json
 import threading
@@ -14,7 +15,7 @@ from starlette.responses import FileResponse, JSONResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-from .config import BACKTEST_JSON, CARBON_BACKTEST_JSON, DATA, DATASET_META, DEMO_STATE, LIVE_JSON, WEB
+from .config import BACKTEST_JSON, CARBON_BACKTEST_JSON, DATA, DATASET_CSV, DATASET_META, DEMO_STATE, LIVE_JSON, WEB
 from . import zk
 
 _run_lock = threading.Lock()
@@ -30,10 +31,24 @@ async def index(_: Request):
     return FileResponse(WEB / "index.html")
 
 
+@functools.lru_cache(maxsize=4)
+def _annual_match(dataset_mtime: float, backtest_mtime: float) -> float | None:
+    """The fixed portfolio's ANNUAL match: portfolio share k (stored by the agent backtest) x annual wind / annual
+    load, from the hourly dataset. The portfolio is sized so this is 100 %; computing it keeps the hero honest."""
+    bt = _read(BACKTEST_JSON)
+    if not bt or not DATASET_CSV.exists():
+        return None
+    df = pd.read_csv(DATASET_CSV, usecols=["load_mwh", "wind_mwh"])
+    return float(bt["portfolio_share_k"] * df["wind_mwh"].sum() / df["load_mwh"].sum())
+
+
 async def overview(_: Request):
     demo = _read(DEMO_STATE)
+    am = (_annual_match(DATASET_CSV.stat().st_mtime, BACKTEST_JSON.stat().st_mtime)
+          if DATASET_CSV.exists() and BACKTEST_JSON.exists() else None)
     return JSONResponse({
         "dataset": _read(DATASET_META),
+        "annual_match": am,
         "backtest": _read(BACKTEST_JSON),
         "zk": _read(zk.ZK_META),
         "demo": demo,
@@ -96,6 +111,7 @@ async def carbon_view(_: Request):
            "strategies": [{"id": k, "label": STRATEGY_LABELS[k], "reference": k == "carbon_perfect", **v}
                           for k, v in bt["strategies"].items()],
            "robustness": {k: v for k, v in bt["robustness"].items() if isinstance(v, dict)},
+           "frozen_config": {k: bt["frozen_config"][k] for k in ("flex_share", "flex_cap")},
            "caveats": bt["caveats"]}
     demo = _read(DEMO_STATE)
     w = (demo or {}).get("window", {})

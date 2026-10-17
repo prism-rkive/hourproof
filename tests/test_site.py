@@ -1,4 +1,5 @@
 """The static dashboard (Vercel): config, committed snapshot, exporter guards and the build script."""
+import csv
 import json
 import re
 import shutil
@@ -45,6 +46,30 @@ class SnapshotTests(unittest.TestCase):
         for k in ANVIL_KEYS:  # the only private keys this repository knows; real keys are checked by the secret scan
             self.assertNotIn(k[2:], text)
         self.assertNotIn("private_key", text)
+
+    def test_annual_match_is_100_percent_from_the_hourly_data(self):
+        with open(ROOT / "data" / "hourly.csv", newline="") as f:
+            rows = list(csv.DictReader(f))
+        k = json.loads((ROOT / "data" / "agent_backtest.json").read_text())["portfolio_share_k"]
+        annual = k * sum(float(r["wind_mwh"]) for r in rows) / sum(float(r["load_mwh"]) for r in rows)
+        self.assertAlmostEqual(annual, 1.0, places=6)
+        self.assertAlmostEqual(json.loads((SNAP / "overview.json").read_text())["annual_match"], annual, places=9)
+
+    def test_frozen_carbon_config_matches_the_backtest(self):
+        frozen = json.loads((ROOT / "data" / "carbon_backtest.json").read_text())["frozen_config"]
+        snap = json.loads((SNAP / "carbon.json").read_text())["frozen_config"]
+        self.assertEqual(snap, {k: frozen[k] for k in ("flex_share", "flex_cap")})
+
+    def test_note_count_is_read_from_the_note_contract(self):
+        o = json.loads((SNAP / "overview.json").read_text())
+        m = next(s for s in o["demo"]["steps"] if s["id"] == "note")["metrics"]
+        self.assertGreater(m["notes_subscribed"], 0)
+        self.assertIn(o["demo"]["contracts"]["SustainabilityLinkedNote"]["address"], m["notes_subscribed_source"])
+        self.assertIn("totalSupply()", m["notes_subscribed_source"])
+
+    def test_carbon_test_period_is_jul_to_dec_2025(self):  # the "What this does not claim" text names this period
+        start, end = json.loads((SNAP / "carbon.json").read_text())["test_period"]
+        self.assertEqual((start[:7], end[:7]), ("2025-07", "2025-12"))
 
     def test_exporter_refuses_an_unverified_or_unfinished_run(self):
         with tempfile.TemporaryDirectory() as d:

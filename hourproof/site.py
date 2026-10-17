@@ -21,6 +21,26 @@ EVIDENCE = ROOT / "evidence" / f"base-sepolia-{VERIFIED_RUN}"
 SNAPSHOT_DIR = ROOT / "deploy" / "snapshot"
 
 
+def notes_from_chain(contracts: dict, rpc: str = "https://sepolia.base.org") -> dict:
+    """Notes outstanding = the note contract's totalSupply() in the payment token's units (decimals()), read-only
+    from Base Sepolia. Fails instead of guessing if the chain cannot be read."""
+    from .chain import tool
+    import subprocess
+
+    def call(addr: str, sig: str) -> int:
+        out = subprocess.run([tool("cast"), "call", addr, sig, "--rpc-url", rpc], capture_output=True, text=True,
+                             timeout=60)
+        if out.returncode:
+            raise SystemExit(f"cannot read {sig} at {addr} from {rpc}: {out.stderr.strip()[:200]}")
+        return int(out.stdout.split()[0])
+
+    note, usd = contracts["SustainabilityLinkedNote"]["address"], contracts["TestUSD"]["address"]
+    supply, decimals = call(note, "totalSupply()(uint256)"), call(usd, "decimals()(uint8)")
+    return {"notes_subscribed": supply / 10 ** decimals,
+            "notes_subscribed_source": f"totalSupply() of SustainabilityLinkedNote {note} on Base Sepolia, in units of "
+                                       f"TestUSD decimals() = {decimals}, read when the snapshot was exported"}
+
+
 def export(evidence=EVIDENCE, out=SNAPSHOT_DIR) -> dict:
     from . import server
     state_file = evidence / "state.json"
@@ -38,6 +58,9 @@ def export(evidence=EVIDENCE, out=SNAPSHOT_DIR) -> dict:
         overview = asyncio.run(body(server.overview))
         week = asyncio.run(body(server.week))
         carbon = asyncio.run(body(server.carbon_view))
+    note_step = next(s for s in overview["demo"]["steps"] if s["id"] == "note")
+    if "notes_subscribed" not in note_step["metrics"]:  # the run did not record it: read it from the chain itself
+        note_step["metrics"].update(notes_from_chain(overview["demo"]["contracts"]))
     overview["static_snapshot"] = {
         "run_id": state["run_id"], "network": state["network"],
         "verification": "re-verified on-chain: " + next(l for l in verify_log.splitlines() if l.startswith("VERIFIED:")),

@@ -8,6 +8,10 @@
   "Unmatched hours are valued at the hourly grid average intensity, not a residual-mix factor.",
   "Nothing here is audited."
  ],
+ "frozen_config": {
+  "flex_cap": 0.25,
+  "flex_share": 0.1
+ },
  "improvement_vs_best_persistence": 0.47070744242868934,
  "mae": {
   "lag168": 38.36066062105363,
