@@ -1,0 +1,19 @@
+# python -m hourproof verify --state evidence/base-sepolia-20261017T141639Z/state.json   (read-only; run 2026-10-17T17:06:37Z, no private key present)
+  ✓ chain id                                                   84532
+  ✓ receipts                                                   80/80 succeeded and match
+  ✓ contract code deployed                                     15/15
+  ✓ ClaimManager uses the deployed coverage verifier           0x4a2FE5e531e758F9ab5606Ea9bB6389b300d8D7F
+  ✓ ClaimManager uses the deployed emissions verifier          0xB2F388B518b677D1310ed894762ED86BcED080FD
+  ✓ ClaimManager reads the deployed intensity oracle           0xF99Effe54c22b1A030E3357859dC400630aA0227
+  ✓ coverage verifier is the real UltraHonk verifier (code size) 18,145 bytes
+  ✓ coverage proof from the tx re-verifies on-chain            8,768-byte proof, 170 public inputs rebuilt by ClaimManager
+  ✓ coverage proof with one flipped byte is rejected           
+  ✓ emissions verifier is the real UltraHonk verifier (code size) 18,145 bytes
+  ✓ emissions proof from the tx re-verifies on-chain           8,768-byte proof, 339 public inputs rebuilt by ClaimManager
+  ✓ emissions proof with one flipped byte is rejected          
+  ✓ proven coverage on-chain                                   75.00%
+  ✓ proven residual on-chain                                   546.1 t
+  ✓ agent plans revealed on-chain                              7/7
+
+VERIFIED: run 20261017T141639Z on base-sepolia (80 transactions)
+exit 0

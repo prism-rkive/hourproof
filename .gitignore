@@ -1,0 +1,55 @@
+# --- secrets: never commit ---------------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.keystore
+keystore/
+.vercel/
+
+# --- environments and build output ------------------------------------------------------------------------------
+.venv/
+__pycache__/
+*.pyc
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/src/generated/
+contracts/test/fixtures/zk/
+circuits/target/
+hp_ai/emissions/target/
+site/
+node_modules/
+.ipynb_checkpoints/
+*.log
+.DS_Store
+
+# --- proof inputs: the private hourly load and commitment salts --------------------------------------------------
+circuits/*/Prover.toml
+hp_ai/emissions/Prover.toml
+
+# --- data: only frozen choices, results and the two processed hourly datasets are committed ----------------------
+data/*
+!data/.gitkeep
+!data/agent_config.json
+!data/agent_config_freeze1_superseded.json
+!data/agent_experiments.json
+!data/agent_experiments_freeze1_superseded.json
+!data/agent_backtest.json
+!data/agent_backtest_v1.json
+!data/agent_ml_ablation.json
+!data/carbon_backtest.json
+!data/zk_meta.json
+!data/zk_emissions_fixture.json
+!data/hourly.csv
+!data/hourly_meta.json
+!data/carbon_hourly.csv
+!data/carbon_hourly_meta.json
+# the demo issuers' ML-DSA secret keys (their public keys are on Base Sepolia): never re-include
+data/keys/
+
+# --- kill-test downloads: only the price files that `data import-carbon hp_ai` needs ------------------------------
+hp_ai/cache/*
+!hp_ai/cache/Elspotprices_*.json
+!hp_ai/cache/DayAheadPrices_*.json

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "policy": "lp",
+    "alpha": 5.0,
+    "load_model": "residual",
+    "wind_features": "area_type",
+    "wind_quantiles": [
+      0.25,
+      0.5,
+      0.75
+    ]
+  },
+  "tag": "lp|alpha=5|load=residual|wind=area_type|q=0.25,0.5,0.75",
+  "params": {
+    "flex_share": 0.1,
+    "flex_cap": 0.25,
+    "topup_share": 0.05
+  },
+  "selected_on": [
+    "2025-04-01",
+    "2025-07-01"
+  ],
+  "frozen_utc": "2026-10-14T20:28:22+00:00",
+  "experiments_sha256": "a28783e934406e88e2cc21c354322462fb229eedfb08136f432e42ae7b890762"
+}

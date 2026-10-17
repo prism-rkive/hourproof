@@ -1,0 +1,8 @@
+[package]
+name = "emissions"
+type = "bin"
+authors = ["HourProof"]
+compiler_version = ">=1.0.0"
+
+[dependencies]
+hp_lib = { path = "../hp_lib" }

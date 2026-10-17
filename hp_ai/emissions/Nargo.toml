@@ -1,0 +1,6 @@
+[package]
+name = "emissions"
+type = "bin"
+authors = [""]
+
+[dependencies]

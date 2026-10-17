@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "1. setup (tools + venv + build)", "type": "shell", "command": "make setup", "problemMatcher": [] },
+    { "label": "2. doctor", "type": "shell", "command": "make doctor", "problemMatcher": [] },
+    { "label": "3. fetch real data", "type": "shell", "command": "make data", "problemMatcher": [] },
+    { "label": "4. end-to-end (everything + checklist)", "type": "shell", "command": "make e2e", "problemMatcher": [], "group": { "kind": "test", "isDefault": true } },
+    { "label": "dashboard", "type": "shell", "command": "make serve", "isBackground": true, "problemMatcher": [] },
+    { "label": "tests (python + noir + solidity)", "type": "shell", "command": "make test", "problemMatcher": [] },
+    { "label": "demo on local chain", "type": "shell", "command": "make demo", "problemMatcher": [] },
+    { "label": "demo on Base Sepolia", "type": "shell", "command": "make demo-base", "problemMatcher": [] }
+  ]
+}

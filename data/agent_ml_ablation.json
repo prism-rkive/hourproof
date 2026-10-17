@@ -1,0 +1,66 @@
+{
+  "frozen_config": "lp|alpha=5|load=selector|wind=area_type|q=0.25,0.5,0.75",
+  "period": "test",
+  "variants": {
+    "v2 (frozen)": {
+      "tag": "lp|alpha=5|load=selector|wind=area_type|q=0.25,0.5,0.75",
+      "coverage": {
+        "naive_fixed_portfolio": 0.7045314415580536,
+        "bigger_portfolio_same_mwh": 0.717208590304556,
+        "agent_shift_only": 0.7144150300518456,
+        "agent_shift_and_topup": 0.7569433000757926,
+        "perfect_foresight_bound": 0.7673130031401195
+      },
+      "gain_vs_same_mwh_pp": 3.973470977123661,
+      "extra_share_of_test_load": 0.04805978039786245,
+      "extra_certificate_mwh": 41930.45615297066,
+      "wind_mae_point_mwh": 381.78505799537226,
+      "load_mae_used_mwh": 2.325762385048084
+    },
+    "wind = raw day-ahead forecast": {
+      "tag": "lp|alpha=5|load=selector|wind=raw_forecast|q=mean",
+      "coverage": {
+        "naive_fixed_portfolio": 0.7045314415580536,
+        "bigger_portfolio_same_mwh": 0.717198519610676,
+        "agent_shift_only": 0.7116203048635581,
+        "agent_shift_and_topup": 0.7529574653265754,
+        "perfect_foresight_bound": 0.7673130031401195
+      },
+      "gain_vs_same_mwh_pp": 3.5758945715899326,
+      "extra_share_of_test_load": 0.04802041430200294,
+      "extra_certificate_mwh": 41896.110628653114,
+      "wind_mae_point_mwh": 514.3280993228598,
+      "load_mae_used_mwh": 2.325762385048084
+    },
+    "load = last week": {
+      "tag": "lp|alpha=5|load=lag168|wind=area_type|q=0.25,0.5,0.75",
+      "coverage": {
+        "naive_fixed_portfolio": 0.7045314415580536,
+        "bigger_portfolio_same_mwh": 0.7172208744210541,
+        "agent_shift_only": 0.7143775184025268,
+        "agent_shift_and_topup": 0.7567497197250309,
+        "perfect_foresight_bound": 0.7673130031401195
+      },
+      "gain_vs_same_mwh_pp": 3.9528845303976823,
+      "extra_share_of_test_load": 0.04810779870855401,
+      "extra_certificate_mwh": 41972.35042827371,
+      "wind_mae_point_mwh": 381.78505799537226,
+      "load_mae_used_mwh": 2.092027920309654
+    },
+    "both": {
+      "tag": "lp|alpha=5|load=lag168|wind=raw_forecast|q=mean",
+      "coverage": {
+        "naive_fixed_portfolio": 0.7045314415580536,
+        "bigger_portfolio_same_mwh": 0.7172267559190548,
+        "agent_shift_only": 0.711609021577502,
+        "agent_shift_and_topup": 0.7528325219879225,
+        "perfect_foresight_bound": 0.7673130031401195
+      },
+      "gain_vs_same_mwh_pp": 3.5605766068867672,
+      "extra_share_of_test_load": 0.04813078934026687,
+      "extra_certificate_mwh": 41992.40894013092,
+      "wind_mae_point_mwh": 514.3280993228598,
+      "load_mae_used_mwh": 2.092027920309654
+    }
+  }
+}

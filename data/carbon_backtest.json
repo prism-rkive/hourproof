@@ -1,0 +1,190 @@
+{
+  "mode": "carbon",
+  "agent": "hourproof-carbon-v1",
+  "frozen_config": {
+    "use_price": true,
+    "flex_share": 0.1,
+    "flex_cap": 0.25,
+    "load_forecast": "lag168",
+    "model": {
+      "kind": "HistGradientBoostingRegressor",
+      "max_iter": 400,
+      "learning_rate": 0.05,
+      "max_leaf_nodes": 31,
+      "l2_regularization": 1.0,
+      "random_state": 0
+    },
+    "retrain": "monthly walk-forward; the model for month M is trained on hours before M - 6.5 h (D-1 17:30 UTC)",
+    "train_cutoff_hours": 6.5,
+    "selected_on": [
+      "2025-04-01",
+      "2025-07-01"
+    ],
+    "selection_rule": "use_price = (walk-forward VALIDATION MAE with prices < without); everything else fixed in advance",
+    "validation_mae_g_per_kwh": {
+      "use_price_false": 23.821407172429762,
+      "use_price_true": 21.654475678856883
+    },
+    "source": "carbon kill test notebook, real Energinet data; TEST Jul-Dec 2025 run once",
+    "frozen_utc": "2026-10-15T17:01:39+00:00"
+  },
+  "model_tag": "co2-hgbr|it=400|lr=0.05|leaves=31|l2=1.0|price=True",
+  "periods": {
+    "train_from": "2025-01-01",
+    "validation": [
+      "2025-04-01",
+      "2025-07-01"
+    ],
+    "test": [
+      "2025-07-01",
+      "2025-12-30"
+    ]
+  },
+  "test_days": 183,
+  "test_hours": 4392,
+  "portfolio_share_k": 0.08873022689599587,
+  "forecast": {
+    "test_mae_g_per_kwh": {
+      "model": 20.30401217024254,
+      "lag48": 41.40545328501187,
+      "lag168": 38.36066062105363
+    },
+    "test_hours_scored": 4415,
+    "improvement_vs_best_persistence": 0.47070744242868934,
+    "validation_mae_frozen": {
+      "use_price_false": 23.821407172429762,
+      "use_price_true": 21.654475678856883
+    },
+    "validation_mae_rerun": {
+      "use_price_false": 23.898386104256016,
+      "use_price_true": 21.650724220016343
+    },
+    "use_price": true
+  },
+  "strategies": {
+    "no_shift": {
+      "emissions_t": 48840.187048520536,
+      "residual_unmatched_t": 21837.225169267218,
+      "coverage": 0.7045260432051597,
+      "reduction_vs_no_shift": 0.0
+    },
+    "shift_for_mwh": {
+      "emissions_t": 47889.07857748548,
+      "residual_unmatched_t": 20776.86616824054,
+      "coverage": 0.7147440540316787,
+      "reduction_vs_no_shift": 0.019473890836867014
+    },
+    "carbon_persist": {
+      "emissions_t": 48546.49597207288,
+      "residual_unmatched_t": 21737.777547944064,
+      "coverage": 0.7002617782459712,
+      "reduction_vs_no_shift": 0.0060133077736964635
+    },
+    "carbon_model": {
+      "emissions_t": 47633.84383659254,
+      "residual_unmatched_t": 20597.967747772054,
+      "coverage": 0.7133703433932315,
+      "reduction_vs_no_shift": 0.024699807368254945
+    },
+    "carbon_perfect": {
+      "emissions_t": 46856.46146780743,
+      "residual_unmatched_t": 20071.849950535714,
+      "coverage": 0.7137008092906354,
+      "reduction_vs_no_shift": 0.04061666632730876
+    }
+  },
+  "reductions_vs_no_shift": {
+    "shift_for_mwh": 0.019473890836867014,
+    "carbon_persist": 0.0060133077736964635,
+    "carbon_model": 0.024699807368254945,
+    "carbon_perfect": 0.04061666632730876
+  },
+  "tonnes_saved_vs_no_shift": {
+    "shift_for_mwh": 951.1084710350551,
+    "carbon_persist": 293.6910764476561,
+    "carbon_model": 1206.343211927997,
+    "carbon_perfect": 1983.7255807131078
+  },
+  "carbon_model_share_of_perfect_reduction": 0.6081200059407126,
+  "coverage_cost_vs_shift_for_mwh_pp": 0.13737106384472675,
+  "robustness": {
+    "method": "weekly block bootstrap: 27 blocks of 7 consecutive days, resampled with replacement",
+    "resamples": 2000,
+    "seed": 0,
+    "blocks": 27,
+    "note": "reported only; never used to choose anything",
+    "carbon_model_minus_shift_for_mwh": {
+      "definition": "emission reduction of carbon_model minus that of shift_for_mwh (positive = carbon_model cuts more)",
+      "reduction_pp": 0.5225916531387923,
+      "reduction_pp_ci95": [
+        0.21970935822765328,
+        0.8311682998952193
+      ],
+      "tonnes": 255.23474089294177,
+      "tonnes_ci95": [
+        106.33821075510195,
+        399.56314111109344
+      ],
+      "share_of_resamples_above_zero": 1.0
+    },
+    "carbon_model_minus_carbon_persist": {
+      "definition": "emission reduction of carbon_model minus that of carbon_persist (positive = carbon_model cuts more)",
+      "reduction_pp": 1.8686499594558215,
+      "reduction_pp_ci95": [
+        1.411663218801256,
+        2.4408820864346596
+      ],
+      "tonnes": 912.6521354803263,
+      "tonnes_ci95": [
+        695.427617822697,
+        1162.2300646178192
+      ],
+      "share_of_resamples_above_zero": 1.0
+    }
+  },
+  "killtest_reference": {
+    "mae": {
+      "model": 20.277003240953952,
+      "lag168": 38.36066062105363,
+      "lag48": 41.40545328501187
+    },
+    "emissions_t": {
+      "no_shift": 48840.187048520536,
+      "shift_for_mwh": 47889.07857748548,
+      "carbon_persist": 48546.49597207288,
+      "carbon_model": 47631.72098854285,
+      "carbon_perfect": 46856.46146780743
+    },
+    "coverage": {
+      "no_shift": 0.7045260432051597,
+      "shift_for_mwh": 0.7147440540316787,
+      "carbon_persist": 0.7002617782459712,
+      "carbon_model": 0.7136157018173496,
+      "carbon_perfect": 0.7137008092906354
+    }
+  },
+  "reproduction_rel_diff": {
+    "emissions_t.no_shift": 0.0,
+    "emissions_t.shift_for_mwh": 0.0,
+    "emissions_t.carbon_persist": 0.0,
+    "emissions_t.carbon_model": 4.45679476959171e-05,
+    "emissions_t.carbon_perfect": 0.0,
+    "coverage.no_shift": 0.0,
+    "coverage.shift_for_mwh": 0.0,
+    "coverage.carbon_persist": 0.0,
+    "coverage.carbon_model": -0.00034382430696699995,
+    "coverage.carbon_perfect": 0.0,
+    "mae.model": 0.0013319980752399818,
+    "mae.lag48": 0.0,
+    "mae.lag168": 0.0
+  },
+  "caveats": [
+    "Average, location-based grid emission factors (Energinet's declaration, 125 % method) for a buyer's accounting; not marginal emissions and not physically avoided emissions.",
+    "The 10 % flexible share (and the +25 % hourly cap) is a declared scenario parameter, not a measured property of the IT sector's load.",
+    "One test half-year (Jul-Dec 2025); no claim that the results generalise beyond it.",
+    "Training uses Energinet's Final declaration as if it were available at decision time; Final is published later (live mode uses the Initial version for the lag features).",
+    "Unmatched hours are valued at the hourly grid average intensity, not a residual-mix factor.",
+    "Nothing here is audited."
+  ],
+  "note": "carbon_perfect uses the actual intensity: a reference, not something a planner can achieve."
+}

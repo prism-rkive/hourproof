@@ -1,0 +1,18 @@
+{
+  "week_utc": "2025-08-12 00:00:00",
+  "threshold_bps": 4476,
+  "cap_kg": 1842741,
+  "residual_t": 1842.740914,
+  "prove_seconds": 1.41,
+  "proof_bytes": 8768,
+  "native_verify": true,
+  "cap_minus_1kg_refused": true,
+  "circuit_gates": 62243,
+  "public_inputs": 339,
+  "commitment_equals_load_commit": true,
+  "killtest_reference": {
+    "threshold_bps": 4476,
+    "residual_t": 1842.7,
+    "circuit_gates": 62240
+  }
+}

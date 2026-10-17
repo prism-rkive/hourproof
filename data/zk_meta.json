@@ -1,0 +1,26 @@
+{
+  "verifier_contract": "HonkVerifier",
+  "emissions_verifier_contract": "EmissionsHonkVerifier",
+  "nargo": "nargo version = 1.0.0-beta.22",
+  "bb": "5.0.0-nightly.20260522",
+  "generated": "src/generated/HonkVerifier.sol",
+  "emissions_generated": "src/generated/EmissionsHonkVerifier.sol",
+  "runtime_bytes": {
+    "HonkVerifier.sol:CommitmentSchemeLib": 85,
+    "HonkVerifier.sol:Errors": 85,
+    "HonkVerifier.sol:FrLib": 85,
+    "HonkVerifier.sol:Honk": 85,
+    "HonkVerifier.sol:HonkVerificationKey": 85,
+    "HonkVerifier.sol:HonkVerifier": 18145,
+    "HonkVerifier.sol:RelationsLib": 7966,
+    "HonkVerifier.sol:ZKTranscriptLib": 6151,
+    "EmissionsHonkVerifier.sol:EmissionsCommitmentSchemeLib": 85,
+    "EmissionsHonkVerifier.sol:EmissionsErrors": 85,
+    "EmissionsHonkVerifier.sol:EmissionsFrLib": 85,
+    "EmissionsHonkVerifier.sol:EmissionsHonk": 85,
+    "EmissionsHonkVerifier.sol:EmissionsHonkVerificationKey": 85,
+    "EmissionsHonkVerifier.sol:EmissionsHonkVerifier": 18145,
+    "EmissionsHonkVerifier.sol:EmissionsRelationsLib": 7966,
+    "EmissionsHonkVerifier.sol:EmissionsZKTranscriptLib": 6151
+  }
+}

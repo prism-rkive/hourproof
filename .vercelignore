@@ -1,0 +1,9 @@
+# Allow-list: Vercel only needs the frontend, the committed snapshot and the build script.
+# Everything else (sources, data, .env, keys, evidence, caches) is never uploaded to Vercel.
+/*
+!/web
+!/deploy
+!/scripts
+/scripts/*
+!/scripts/build_site.sh
+!/vercel.json

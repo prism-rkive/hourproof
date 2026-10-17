@@ -1,0 +1,10 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "name": "Dashboard (serve)", "type": "debugpy", "request": "launch", "module": "hourproof", "args": ["serve"], "justMyCode": true,
+      "env": { "PATH": "${workspaceFolder}/.venv/bin:${env:HOME}/.hourproof/bin:${env:PATH}" } },
+    { "name": "Demo (local chain)", "type": "debugpy", "request": "launch", "module": "hourproof", "args": ["demo", "--network", "local"],
+      "env": { "PATH": "${workspaceFolder}/.venv/bin:${env:HOME}/.hourproof/bin:${env:PATH}" } },
+    { "name": "Agent backtest", "type": "debugpy", "request": "launch", "module": "hourproof", "args": ["agent", "backtest"] }
+  ]
+}

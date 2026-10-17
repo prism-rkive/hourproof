@@ -1,0 +1,32 @@
+{
+  "agent": "hourproof-agent-v1",
+  "params": {
+    "flex_share": 0.1,
+    "flex_cap": 0.25,
+    "topup_share": 0.05
+  },
+  "portfolio_share_k": 0.08873203889177884,
+  "test_period": [
+    "2025-07-01",
+    "2025-12-30"
+  ],
+  "test_days": 183,
+  "extra_certificate_mwh": 28195.193860356245,
+  "extra_share_of_test_load": 0.03231672033951576,
+  "coverage": {
+    "naive_fixed_portfolio": 0.7045314415580536,
+    "bigger_portfolio_same_mwh": 0.7131524821412139,
+    "agent_shift_only": 0.7131501534150851,
+    "agent_shift_and_topup": 0.7420007595154474,
+    "perfect_foresight_bound": 0.7528974384222212
+  },
+  "forecast_skill": {
+    "wind_mae_raw_forecast_mwh": 514.3280993228598,
+    "wind_mae_model_mwh": 411.30560151108807,
+    "load_mae_model_mwh": 2.2660014383757634,
+    "load_mae_lag168_mwh": 2.092027920309654
+  },
+  "gain_vs_same_mwh_pp": 2.8848277374233566,
+  "gain_vs_naive_pp": 3.7469317957393833,
+  "note": "Flexible share and top-up budget are declared scenario parameters; every MWh value is real Energinet data; decisions use only information available at D-1 17:30 UTC."
+}

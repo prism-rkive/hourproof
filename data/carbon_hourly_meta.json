@@ -1,0 +1,30 @@
+{
+  "source": "energidataservice.dk (Energinet), imported from the carbon kill test",
+  "imported_from": "hp_ai",
+  "buyer_branch": "JB_JC Telekommunikation & IT- og informationstjenester",
+  "datasets": {
+    "wind_mwh": "ProductionConsumptionSettlement, all *Wind* columns, DK1+DK2",
+    "co2_g_per_kwh": "DeclarationGridEmission CO2PerkWh, Version=Final, FuelAllocationMethod=125%, DK1/DK2 weighted by ProductionConsumptionSettlement GrossConsumptionMWh",
+    "load_mwh": "ConsumptionDK3619IndustryHour, IT/telecom branch",
+    "fc_*": "Forecasts_Hour ForecastDayAhead by PriceArea and ForecastType",
+    "price_eur": "Elspotprices SpotPriceEUR before 2025-10-01, then DayAheadPrices DayAheadPriceEUR hourly mean; mean of DK1 and DK2"
+  },
+  "hours": 8760,
+  "first": "2025-01-01 00:00:00",
+  "last": "2025-12-31 23:00:00",
+  "non_missing": {
+    "wind_mwh": 8760,
+    "co2_g_per_kwh": 8759,
+    "load_mwh": 8760,
+    "fc_DK1_offshore_wind": 8676,
+    "fc_DK1_onshore_wind": 8651,
+    "fc_DK1_solar": 8669,
+    "fc_DK2_offshore_wind": 8676,
+    "fc_DK2_onshore_wind": 8651,
+    "fc_DK2_solar": 8669,
+    "price_eur": 8760
+  },
+  "note": "wind here is settlement wind, as in the kill test; data/hourly.csv (declared wind) is unchanged",
+  "created_utc": "2026-10-15T17:01:16+00:00",
+  "synthetic": false
+}

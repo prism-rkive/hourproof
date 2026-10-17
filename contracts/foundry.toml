@@ -1,0 +1,28 @@
+[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.30"
+evm_version = "cancun"          # Base Sepolia-compatible opcode set
+optimizer = true
+optimizer_runs = 200
+fs_permissions = [{ access = "read", path = "./test/fixtures" }, { access = "read", path = "./lib/evm-ml-dsa-verifier/helpers" }]
+ffi = true                      # PQIntegration.t.sol signs with ML-DSA via test/ffi/mldsa_sign.py
+remappings = [
+  "forge-std/=lib/forge-std/src/",
+  "mldsa/=lib/evm-ml-dsa-verifier/src/",
+]
+
+# The vendored ML-DSA verifier only fits the 24,576-byte contract limit when
+# compiled through via-IR with high optimizer runs (its authors' settings).
+# Everything else (including the generated UltraHonk verifier) uses the default pipeline.
+additional_compiler_profiles = [{ name = "mldsa", via_ir = true, optimizer_runs = 10000 }]
+compilation_restrictions = [{ paths = "lib/evm-ml-dsa-verifier/src/**", via_ir = true, optimizer_runs = 10000 }]
+
+[fuzz]
+runs = 512
+
+[fmt]
+line_length = 120

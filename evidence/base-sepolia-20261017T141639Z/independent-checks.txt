@@ -1,0 +1,31 @@
+# python3 scripts/check_public_run.py evidence/base-sepolia-20261017T141639Z/state.json   (read-only; run 2026-10-17T17:07:48Z, no private key present)
+run 20261017T141639Z on Base Sepolia (84532), 80 recorded transactions
+== settlement (SustainabilityLinkedNote, KPI = RESIDUAL_EMISSIONS)
+  ✓ note settled
+  ✓ KPI kind RESIDUAL_EMISSIONS
+  ✓ KPI outcome follows the proof: proven 546,125 kg vs target 428,509 kg, kpiMet=false
+  ✓ coupon matches the outcome: 600 bps
+  ✓ settle receipt succeeded after the deadline: block time 1792247366, deadline 1792247362
+  ✓ SettledResidual event: [0, 546125, 600]
+  ✓ investor received the coupon: 60 tUSD on 1,000 notes
+  ✓ coupon claimed
+== ML-DSA-44 certificate issuance (verified on-chain by MLDSA44Verifier)
+  ✓ issuer A batches accepted: issuer nonce 7, 7 issuance txs
+  ✓ BatchIssued in every issuance receipt: nonces [0, 1, 2, 3, 4, 5, 6]
+  ✓ registry B: only its one legitimate batch: issuer nonce 1
+== refused attacks left no on-chain effect
+  ✓ intensity re-post: value unchanged: hour 104 = 133 g/kWh
+  ✓ replayed proof: coverage not raised: 75.00%
+  ✓ fake intensity: residual not lowered: 546,125 kg
+  · attack outcomes recorded by the run: [('double_claim', 'SliceAlreadyClaimed'), ('over_issuance', 'ExceedsProduction'), ('forged_signature', 'BadIssuerSignature'), ('overclaim', 'ProverRefused'), ('replay_higher', 'ProofRejected'), ('residual_understated', 'ProverRefused'), ('intensity_repost', 'AlreadyPosted'), ('fake_intensity', 'ProofRejected')]
+== nonces vs every recorded public attempt (3 state files)
+  ✓ admin: 0x4a1740cecaca72b1bdacf05c3f11fcc0fbc06653: recorded 78, nonce 78, pending 78
+  ✓ agent: 0xe164cb213a39819dd2413e0fb0782981e14ff945: recorded 21, nonce 21, pending 21
+  ✓ buyer: 0x99eeab0f9cffc5a9136fa528100cc40cd4762588: recorded 10, nonce 10, pending 10
+  ✓ datahub: 0x90a99b8481113d4a0eab1449201279f10655207d: recorded 1, nonce 1, pending 1
+  ✓ ghost: 0x64f777c73cc3344d680e44a4ad6c90f8c925417a: recorded 0, nonce 0, pending 0
+  ✓ investor: 0x6b7b0636400fd9109fcd9b25574558a48390128d: recorded 4, nonce 4, pending 4
+  ✓ issuer_ops: 0x7660780d945f43592a4cf9b0ef1db35ec88e1773: recorded 11, nonce 11, pending 11
+  ✓ oracle: 0xf0c8e24c3285287870722e612abc9a435cefcb48: recorded 12, nonce 12, pending 12
+ALL CHECKS PASSED
+exit 0

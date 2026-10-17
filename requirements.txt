@@ -1,0 +1,9 @@
+# Python 3.11+ (tested with 3.13)
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.4
+scipy>=1.11           # linprog (HiGHS) for the agent's day plan
+requests>=2.31
+starlette>=0.37
+uvicorn>=0.29
+dilithium-py==1.5.1   # FIPS 204 ML-DSA (pure Python); also used by the Foundry ffi test

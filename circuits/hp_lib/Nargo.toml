@@ -1,0 +1,7 @@
+[package]
+name = "hp_lib"
+type = "lib"
+authors = ["HourProof"]
+compiler_version = ">=1.0.0"
+
+[dependencies]

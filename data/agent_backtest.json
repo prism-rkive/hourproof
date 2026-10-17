@@ -1,0 +1,149 @@
+{
+  "agent": "hourproof-agent-v1",
+  "version": "v2",
+  "params": {
+    "flex_share": 0.1,
+    "flex_cap": 0.25,
+    "topup_share": 0.05
+  },
+  "portfolio_share_k": 0.08873203889177884,
+  "test_period": [
+    "2025-07-01",
+    "2025-12-30"
+  ],
+  "test_days": 183,
+  "extra_certificate_mwh": 41930.45615297066,
+  "extra_share_of_test_load": 0.04805978039786245,
+  "coverage": {
+    "naive_fixed_portfolio": 0.7045314415580536,
+    "bigger_portfolio_same_mwh": 0.717208590304556,
+    "agent_shift_only": 0.7144150300518456,
+    "agent_shift_and_topup": 0.7569433000757926,
+    "perfect_foresight_bound": 0.7673130031401195
+  },
+  "forecast_skill": {
+    "wind_mae_raw_forecast_mwh": 514.3280993228598,
+    "wind_mae_model_mwh": 381.78505799537226,
+    "load_mae_model_mwh": 2.325762385048084,
+    "load_mae_lag168_mwh": 2.092027920309654,
+    "load_forecast_used": "selector",
+    "load_mae_residual_model_mwh": 2.5051374814024006,
+    "load_mae_selector_mwh": 2.325762385048084,
+    "load_mae_v1_gbr_mwh": 2.2660014383757634
+  },
+  "load_mae_selector_mwh": 2.325762385048084,
+  "wind_pinball": {
+    "0.25": 157.19924952348399,
+    "0.5": 190.2079599763002,
+    "0.75": 165.05495337279197
+  },
+  "gain_vs_same_mwh_pp": 3.973470977123661,
+  "gain_vs_naive_pp": 5.241185851773899,
+  "selected_config": {
+    "policy": "lp",
+    "alpha": 5.0,
+    "load_model": "selector",
+    "wind_features": "area_type",
+    "wind_quantiles": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "tag": "lp|alpha=5|load=selector|wind=area_type|q=0.25,0.5,0.75"
+  },
+  "budget": {
+    "rule": "rolling balance, capped at 7 days; spend_cap = min(balance, alpha * budget_day); unfilled purchases refunded after the day ends",
+    "budget_day_mwh": 232.0175365957758,
+    "budget_total_mwh": 42459.20919702697,
+    "budget_total_share_of_test_load": 0.048665825681255985,
+    "alpha": 5.0,
+    "balance_cap_days": 7,
+    "max_cumulative_overspend_mwh": 4.547473508864641e-13
+  },
+  "perfect_foresight": {
+    "definition": "same policy and same budget rule, fed with actual load, wind and availability",
+    "extra_certificate_mwh": 41995.174123835415
+  },
+  "load_selector_choices": {
+    "2025-07-01": {
+      "window": [
+        "2025-05-01 00:00:00",
+        "2025-06-28 17:30:00"
+      ],
+      "hours": 1410,
+      "choice": "residual",
+      "mae_residual": 1.6264666709130724,
+      "mae_lag168": 1.8867432524822696
+    },
+    "2025-08-01": {
+      "window": [
+        "2025-06-01 00:00:00",
+        "2025-07-29 17:30:00"
+      ],
+      "hours": 1410,
+      "choice": "residual",
+      "mae_residual": 2.2496731738940636,
+      "mae_lag168": 2.5828613148936164
+    },
+    "2025-09-01": {
+      "window": [
+        "2025-07-01 00:00:00",
+        "2025-08-29 17:30:00"
+      ],
+      "hours": 1434,
+      "choice": "residual",
+      "mae_residual": 3.0658950254339725,
+      "mae_lag168": 3.3028601576011165
+    },
+    "2025-10-01": {
+      "window": [
+        "2025-08-01 00:00:00",
+        "2025-09-28 17:30:00"
+      ],
+      "hours": 1410,
+      "choice": "lag168",
+      "mae_residual": 3.6723519311653456,
+      "mae_lag168": 2.867930964539008
+    },
+    "2025-11-01": {
+      "window": [
+        "2025-09-01 00:00:00",
+        "2025-10-29 17:30:00"
+      ],
+      "hours": 1410,
+      "choice": "lag168",
+      "mae_residual": 2.656485114416339,
+      "mae_lag168": 1.6241040021276596
+    },
+    "2025-12-01": {
+      "window": [
+        "2025-10-01 00:00:00",
+        "2025-11-28 17:30:00"
+      ],
+      "hours": 1410,
+      "choice": "lag168",
+      "mae_residual": 1.7273821848919828,
+      "mae_lag168": 1.2324870723404255
+    }
+  },
+  "v1_feature_fill_days": 0,
+  "note": "Flexible share and top-up budget are declared scenario parameters; every MWh value is real Energinet data; decisions use only information available at D-1 17:30 UTC.",
+  "validation": {
+    "validation_coverage": 0.7053134503695018,
+    "coverage": {
+      "naive_fixed_portfolio": 0.6502161000683727,
+      "bigger_portfolio_same_mwh": 0.6667699739230841,
+      "agent_shift_only": 0.663067809348732,
+      "agent_shift_and_topup": 0.7053134503695018,
+      "perfect_foresight_bound": 0.7214356335560265
+    },
+    "extra_share_of_val_load": 0.048478188678024066,
+    "gain_vs_same_mwh_pp": 3.8543476446417646,
+    "load_mae_mwh": 1.6944683597038215,
+    "wind_mae_model_mwh": 358.9965636604662,
+    "period": [
+      "2025-04-01",
+      "2025-07-01"
+    ]
+  }
+}

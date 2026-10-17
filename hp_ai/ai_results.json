@@ -1,0 +1,77 @@
+{
+  "K1_co2_forecast": {
+    "status": "PASS",
+    "summary": "TEST MAE 20.3 vs best persistence 38.4 g/kWh (47% better; bar 30%)",
+    "metrics": {
+      "validation": {
+        "false": 23.821407172429762,
+        "true": 21.654475678856883
+      },
+      "use_price": true,
+      "model": 20.277003240953952,
+      "lag48": 41.40545328501187,
+      "lag168": 38.36066062105363
+    }
+  },
+  "K2_carbon_shifting": {
+    "status": "PASS",
+    "summary": "learned-forecast shifting cuts the buyer's location-based emissions 2.47% (1,208 t in 6 months); coverage vs MWh-shifting -0.11 pp",
+    "metrics": {
+      "results": {
+        "no_shift": {
+          "emissions_t": 48840.187048520536,
+          "residual_unmatched_t": 21837.225169267218,
+          "coverage": 0.7045260432051597
+        },
+        "shift_for_mwh": {
+          "emissions_t": 47889.07857748548,
+          "residual_unmatched_t": 20776.86616824054,
+          "coverage": 0.7147440540316787
+        },
+        "carbon_persist": {
+          "emissions_t": 48546.49597207288,
+          "residual_unmatched_t": 21737.777547944064,
+          "coverage": 0.7002617782459712
+        },
+        "carbon_model": {
+          "emissions_t": 47631.72098854285,
+          "residual_unmatched_t": 20592.3076264191,
+          "coverage": 0.7136157018173496
+        },
+        "carbon_perfect": {
+          "emissions_t": 46856.46146780743,
+          "residual_unmatched_t": 20071.849950535714,
+          "coverage": 0.7137008092906354
+        }
+      },
+      "reductions": {
+        "carbon_persist": 0.0060133077736964635,
+        "carbon_model": 0.024743272559073715,
+        "carbon_perfect": 0.04061666632730876,
+        "shift_for_mwh": 0.019473890836867014
+      }
+    }
+  },
+  "K3_ai_is_load_bearing": {
+    "status": "PASS",
+    "summary": "learned forecast reaches 61% of the perfect-forecast reduction; persistence reaches 15%",
+    "metrics": {
+      "carbon_persist": 0.0060133077736964635,
+      "carbon_model": 0.024743272559073715,
+      "carbon_perfect": 0.04061666632730876,
+      "shift_for_mwh": 0.019473890836867014
+    }
+  },
+  "K4_zk_emissions": {
+    "status": "PASS",
+    "summary": "week 2025-08-12: coverage >= 44.76% and residual <= 1,842.7 t; prove OK (6.5s), verify OK; cap 1 kg lower refused: True; circuit 62240 gates",
+    "metrics": {
+      "prove_s": 6.5478479862213135,
+      "honest_ok": true,
+      "tighter_cap_refused": true,
+      "native_verify": true,
+      "solidity_source_bytes": 102147,
+      "circuit_size": 62240
+    }
+  }
+}

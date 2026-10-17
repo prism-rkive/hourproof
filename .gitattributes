@@ -1,0 +1,8 @@
+# LF everywhere (the project runs on Linux/WSL; Windows tools must not reintroduce CRLF)
+* text=auto eol=lf
+
+# binary artifacts: never normalise
+*.png binary
+*.gz binary
+evidence/**/proof binary
+evidence/**/public_inputs binary

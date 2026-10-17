@@ -1,0 +1,52 @@
+{
+  "config": {
+    "policy": "lp",
+    "alpha": 5.0,
+    "load_model": "selector",
+    "wind_features": "area_type",
+    "wind_quantiles": [
+      0.25,
+      0.5,
+      0.75
+    ]
+  },
+  "tag": "lp|alpha=5|load=selector|wind=area_type|q=0.25,0.5,0.75",
+  "params": {
+    "flex_share": 0.1,
+    "flex_cap": 0.25,
+    "topup_share": 0.05
+  },
+  "selected_on": [
+    "2025-04-01",
+    "2025-07-01"
+  ],
+  "frozen_utc": "2026-10-14T20:33:49+00:00",
+  "experiments_sha256": "91d9bd597db507b210054ba745a82d001f2756c41d4eec68bebf3fd44dc9f5d3",
+  "carbon": {
+    "use_price": true,
+    "flex_share": 0.1,
+    "flex_cap": 0.25,
+    "load_forecast": "lag168",
+    "model": {
+      "kind": "HistGradientBoostingRegressor",
+      "max_iter": 400,
+      "learning_rate": 0.05,
+      "max_leaf_nodes": 31,
+      "l2_regularization": 1.0,
+      "random_state": 0
+    },
+    "retrain": "monthly walk-forward; the model for month M is trained on hours before M - 6.5 h (D-1 17:30 UTC)",
+    "train_cutoff_hours": 6.5,
+    "selected_on": [
+      "2025-04-01",
+      "2025-07-01"
+    ],
+    "selection_rule": "use_price = (walk-forward VALIDATION MAE with prices < without); everything else fixed in advance",
+    "validation_mae_g_per_kwh": {
+      "use_price_false": 23.821407172429762,
+      "use_price_true": 21.654475678856883
+    },
+    "source": "carbon kill test notebook, real Energinet data; TEST Jul-Dec 2025 run once",
+    "frozen_utc": "2026-10-15T17:01:39+00:00"
+  }
+}

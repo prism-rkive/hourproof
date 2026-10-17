@@ -1,0 +1,24 @@
+{
+  "source": "energidataservice.dk (Energinet)",
+  "datasets": [
+    "DeclarationProduction",
+    "ConsumptionDK3619IndustryHour",
+    "Forecasts_Hour"
+  ],
+  "year": 2025,
+  "declaration_version": "Final",
+  "fuel_allocation_method": "All",
+  "method_wind_error_vs_settlement": {
+    "All": 0.0
+  },
+  "note_on_sources": "DeclarationProduction and ProductionConsumptionSettlement are derived from the same settlement data, so they are NOT independent sources.",
+  "buyer_branch": "JB_JC Telekommunikation &It - og informationstjenester",
+  "buyer_label": "Telekommunikation &It - og informationstjenester",
+  "hours": 8759,
+  "first": "2025-01-01 00:00:00",
+  "last": "2025-12-31 22:00:00",
+  "annual_load_mwh": 1693534.669202,
+  "hourly_match_of_100pct_annual_wind": 0.6971853567110985,
+  "created_utc": "2026-10-14T20:09:41+00:00",
+  "synthetic": false
+}
