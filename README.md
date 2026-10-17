@@ -234,25 +234,6 @@ notebooks/   The carbon kill test
 scripts/     install_tools.sh (pinned toolchain), check_public_run.py (independent cast-only checker), build_site.sh
 ```
 
-## Claims to make, and claims not to make
-
-Make: a second claim on the same MWh-hour is refused across registries; coverage and residual emissions are
-proven without revealing load, against certificates and intensities the contract reads itself; issuer
-signatures are FIPS 204 ML-DSA verified on-chain; the agent's plans are committed before the day; the
-procurement agent's gain is measured against a portfolio with exactly the same extra MWh; the learned CO2
-forecast has 47 % lower error than persistence (chosen on validation, tested once); shifting 10 % of the IT
-sector's load by it cuts location-based emissions 2.47 % (about 1,208 t in six months), against 0.60 % with
-persistence and 4.06 % with a perfect forecast; with persistence, carbon-aware shifting is worse than simply
-shifting for MWh matching (0.60 % vs 1.95 %), with the learned forecast it is better (2.47 %).
-
-Do not make: that these are marginal or physically avoided emissions (they are average, location-based factors
-for a buyer's accounting); that the 10 % flexibility is measured (it is a declared scenario parameter); that
-the results generalise beyond Jul–Dec 2025; that unmatched hours use a residual-mix factor (they use the
-hourly grid average); that regulation mandates hourly matching (the GHG Protocol Scope 2 revision is contested
-and its final standard is expected end-2028); that the demo issuers are accredited; that the oracles have an
-independent second source; that the whole stack is post-quantum (UltraHonk and ECDSA are not); that any of this
-is audited. See `docs/SECURITY.md`.
-
 ## Data and licences
 
 Energi Data Service (Energinet), keyless public API: `DeclarationProduction`, `ConsumptionDK3619IndustryHour`,
