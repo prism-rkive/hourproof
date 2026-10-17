@@ -104,6 +104,58 @@ export const Week = z.union([
     .passthrough(),
 ]);
 
+export const RunLog = z
+  .object({
+    log: z.string(),
+    running: z.boolean(),
+    recorded: z.boolean().optional(), // the hosted snapshot: the verified run's recorded console output
+    run_id: z.string().optional(),
+    source: z.string().optional(),
+  })
+  .passthrough();
+
+export const Carbon = z.union([
+  z.object({ available: z.literal(false) }),
+  z
+    .object({
+      available: z.literal(true),
+      test_period: z.tuple([z.string(), z.string()]),
+      test_hours: z.number(),
+      mae: z.record(z.number()),
+      improvement_vs_best_persistence: z.number(),
+      strategies: z.array(
+        z
+          .object({
+            id: z.string(),
+            label: z.string(),
+            reference: z.boolean(),
+            emissions_t: z.number(),
+            residual_unmatched_t: z.number(),
+            coverage: z.number(),
+          })
+          .passthrough(),
+      ),
+      robustness: z.record(z.record(z.unknown())),
+      frozen_config: z.object({ flex_share: z.number(), flex_cap: z.number() }),
+      caveats: z.array(z.string()),
+      week: z
+        .object({
+          source: z.string(),
+          hours: z.array(z.string()),
+          intensity: z.array(z.number()),
+          forecast: z.array(z.number()),
+          shift_mwh: z.array(z.number()),
+          mae: z.record(z.number()).nullish(),
+        })
+        .optional(),
+      proof: z.record(z.unknown()).optional(),
+    })
+    .passthrough(),
+]);
+
+export type RunLog = z.infer<typeof RunLog>;
+export type Carbon = z.infer<typeof Carbon>;
+export type CarbonData = Extract<Carbon, { available: true }>;
 export type Overview = z.infer<typeof Overview>;
 export type DemoState = z.infer<typeof DemoState>;
 export type Step = z.infer<typeof Step>;

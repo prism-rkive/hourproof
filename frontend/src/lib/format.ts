@@ -74,6 +74,29 @@ export function weekScope(startHour: string): string {
 }
 
 export const FULL_YEAR = "Full year";
+export const THIS_RUN = "This run";
+
+/** "Test period Jul–Dec 2025" from ISO dates. */
+export function testScope([start, end]: readonly [string, string] | readonly string[]): string {
+  const m = (iso: string) =>
+    new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
+  const y = (iso: string) => iso.slice(0, 4);
+  return y(start!) === y(end!)
+    ? `Test period ${m(start!)}–${m(end!)} ${y(end!)}`
+    : `Test period ${m(start!)} ${y(start!)} – ${m(end!)} ${y(end!)}`;
+}
+
+/** "0x1a71d4…f2ce2ef" */
+export function shortHash(h: string, head = 6, tail = 6): string {
+  return h.length > head + tail + 3 ? `${h.slice(0, head + 2)}…${h.slice(-tail)}` : h;
+}
+
+/** Seconds as "4 min 10 s" / "42.2 s". */
+export function duration(seconds: number): string {
+  if (seconds < 60) return `${seconds.toFixed(1)} s`;
+  const m = Math.floor(seconds / 60);
+  return `${m} min ${Math.round(seconds - 60 * m)} s`;
+}
 
 /** "Mon" (UTC). */
 export function weekday(hour: string): string {

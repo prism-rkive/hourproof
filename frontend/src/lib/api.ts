@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import { Overview, Week } from "./schemas";
+import { Carbon, Overview, RunLog, Week } from "./schemas";
 
 export class ApiError extends Error {
   constructor(
@@ -47,6 +47,20 @@ function cached<S extends z.ZodTypeAny>(path: string, schema: S, fresh = false):
 
 export const getOverview = (fresh = false) => cached("/api/overview", Overview, fresh);
 export const getWeek = (fresh = false) => cached("/api/week", Week, fresh);
+export const getCarbon = (fresh = false) => cached("/api/carbon", Carbon, fresh);
+export const getLog = (fresh = false) => cached("/api/demo/log", RunLog, fresh);
+
+/** Start a run on the local server (the hosted snapshot cannot). Same request as the original dashboard. */
+export async function startRun(network: "local" | "base-sepolia"): Promise<string | null> {
+  const r = await fetch("/api/demo/run", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ network, zk_mode: "real", mode: "carbon" }),
+  });
+  if (r.ok) return null;
+  const e = (await r.json().catch(() => ({}))) as { error?: string };
+  return e.error || `Could not start the run (HTTP ${r.status}).`;
+}
 
 export function clearApiCache() {
   cache.clear();
