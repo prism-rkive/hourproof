@@ -1,0 +1,188 @@
+@import "tailwindcss";
+
+/* Dark mode follows the `dark` class on <html>, set before first paint by the script in index.html. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---- Design tokens --------------------------------------------------------------------------------------------
+   Colours are semantic CSS variables; components never use raw palette colours. Every text colour meets WCAG AA
+   (4.5:1) on background, background-subtle, card and muted in both themes, and the focus ring meets 3:1. Borders are
+   decorative; meaning is never carried by a border colour alone. Ratios below are against --background. */
+:root {
+  --background: #ffffff;
+  --background-subtle: #f8f8f9;
+  --foreground: #0c0d10;
+  --card: #ffffff;
+  --card-foreground: #0c0d10;
+  --popover: #ffffff;
+  --popover-foreground: #0c0d10;
+  --muted: #f3f3f5;
+  --muted-foreground: #565a63; /* 6.9:1 */
+  --subtle-foreground: #676b74; /* 5.3:1 */
+  --border: #e5e6e9;
+  --border-strong: #cfd1d6;
+  --input: #dcdde1;
+  --primary: #0c0d10;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f3f5;
+  --secondary-foreground: #0c0d10;
+  --accent: #f3f3f5;
+  --accent-foreground: #0c0d10;
+  --brand: #047857; /* 5.5:1 */
+  --brand-foreground: #ffffff;
+  --brand-subtle: #ecfdf5;
+  --success: #047857;
+  --success-subtle: #ecfdf5;
+  --warning: #8f5a07; /* 5.8:1 */
+  --warning-subtle: #fefce8;
+  --danger: #b91c1c; /* 6.5:1 */
+  --danger-subtle: #fef2f2;
+  --ring: #059669; /* 3.8:1 */
+  --shadow-color: 220 15% 20%;
+
+  --radius: 0.5rem;
+  --header-height: 3.5rem;
+}
+
+.dark {
+  --background: #09090b;
+  --background-subtle: #0e0f12;
+  --foreground: #ececef;
+  --card: #111215;
+  --card-foreground: #ececef;
+  --popover: #141519;
+  --popover-foreground: #ececef;
+  --muted: #18191d;
+  --muted-foreground: #a3a5ad; /* 8.1:1 */
+  --subtle-foreground: #8a8c95; /* 5.9:1 */
+  --border: #23252b;
+  --border-strong: #33363d;
+  --input: #2a2c32;
+  --primary: #ececef;
+  --primary-foreground: #09090b;
+  --secondary: #18191d;
+  --secondary-foreground: #ececef;
+  --accent: #1c1d22;
+  --accent-foreground: #ececef;
+  --brand: #34d399; /* 10.4:1 */
+  --brand-foreground: #04261a;
+  --brand-subtle: #0b2a20;
+  --success: #34d399;
+  --success-subtle: #0b2a20;
+  --warning: #facc15;
+  --warning-subtle: #2a2408;
+  --danger: #f87171;
+  --danger-subtle: #2c1214;
+  --ring: #34d399;
+  --shadow-color: 0 0% 0%;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-subtle: var(--background-subtle);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-ring: var(--ring);
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-xs: 0 1px 2px hsl(var(--shadow-color) / 0.06);
+  --shadow-sm: 0 1px 3px hsl(var(--shadow-color) / 0.08), 0 1px 2px hsl(var(--shadow-color) / 0.04);
+  --shadow-md: 0 4px 12px hsl(var(--shadow-color) / 0.08), 0 2px 4px hsl(var(--shadow-color) / 0.04);
+  --shadow-lg: 0 12px 32px hsl(var(--shadow-color) / 0.12), 0 4px 8px hsl(var(--shadow-color) / 0.06);
+
+  /* Type scale: 12 / 13 / 14 / 16 / 18 / 20 / 24 / 30 / 36 / 48 */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-13: 0.8125rem;
+  --text-13--line-height: 1.25rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.625rem;
+
+  --animate-in: hp-fade-in 160ms ease-out;
+  --animate-slide-in: hp-slide-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes hp-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes hp-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: calc(var(--header-height) + 1rem);
+  }
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--color-brand) 25%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
