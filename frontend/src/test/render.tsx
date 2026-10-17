@@ -40,6 +40,7 @@ export function figuresWithoutScope(root: HTMLElement): { figures: string[]; uns
   for (let n = walker.nextNode(); n; n = walker.nextNode()) {
     const text = n.textContent ?? "";
     if (!FIGURE.test(text)) continue;
+    if (n.parentElement?.closest("[data-definitions]")) continue; // a definition ("100 basis points are 1 %"), not data
     figures.push(text.trim());
     const holder = n.parentElement?.closest<HTMLElement>("[data-scope]");
     const tag = holder?.querySelector("[data-scope-tag]")?.textContent;

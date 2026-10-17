@@ -79,3 +79,14 @@ test("no page requests anything from another origin (the chain is never called)"
   }
   expect(foreign).toEqual([]);
 });
+
+test("'What this does not claim' is one click away from every page and lands on the section", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/agent");
+  await ready(page);
+  await page.getByRole("contentinfo").getByRole("link", { name: "What this does not claim" }).click();
+  await expect(page).toHaveURL(/\/method#limits$/);
+  await expect(page.getByRole("heading", { name: "What this does not claim" })).toBeInViewport();
+  await page.goto("/method#limits"); // deep link
+  await expect(page.getByRole("heading", { name: "What this does not claim" })).toBeInViewport();
+});
