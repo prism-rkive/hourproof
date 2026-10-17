@@ -14,6 +14,7 @@ export function useChartColors() {
       subtle: v("--subtle-foreground"),
       grid: v("--border"),
       card: v("--card"),
+      series2: v("--series-2"),
       theme,
     };
   }, [theme]);

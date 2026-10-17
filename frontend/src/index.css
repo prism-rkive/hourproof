@@ -37,6 +37,9 @@
   --danger: #b91c1c; /* 6.5:1 */
   --danger-subtle: #fef2f2;
   --ring: #059669; /* 3.8:1 */
+  --seq-lo: #e7f6ee; /* intensity scale: cleanest hour */
+  --seq-hi: #7a3b0c; /* dirtiest hour */
+  --series-2: #b45309; /* second chart series (forecast) */
   --shadow-color: 220 15% 20%;
 
   --radius: 0.5rem;
@@ -73,6 +76,9 @@
   --danger: #f87171;
   --danger-subtle: #2c1214;
   --ring: #34d399;
+  --seq-lo: #0f2a20;
+  --seq-hi: #f2a541;
+  --series-2: #f5b453;
   --shadow-color: 0 0% 0%;
 }
 

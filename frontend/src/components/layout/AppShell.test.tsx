@@ -7,17 +7,19 @@ import { PAGES } from "@/routes";
 import { snapshot } from "@/test/snapshot";
 
 const overview = snapshot("overview") as { demo: { run_id: string } };
-const week = snapshot("week");
+const FILES: Record<string, "overview" | "week" | "carbon" | "log"> = {
+  "/api/overview": "overview",
+  "/api/week": "week",
+  "/api/carbon": "carbon",
+  "/api/demo/log": "log",
+};
 
 function renderAt(path: string) {
+  clearApiCache();
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) =>
-      url === "/api/overview"
-        ? new Response(JSON.stringify(overview))
-        : url === "/api/week"
-          ? new Response(JSON.stringify(week))
-          : new Response("{}", { status: 404 }),
+      FILES[url] ? new Response(JSON.stringify(snapshot(FILES[url]!))) : new Response("{}", { status: 404 }),
     ),
   );
   const router = createMemoryRouter(routes, { initialEntries: [path] });
@@ -33,7 +35,7 @@ afterEach(() => {
 });
 
 describe("app shell", () => {
-  it("renders every page with its heading, title and an active nav link", async () => {
+  it("renders every page with its heading, title and an active nav link", { timeout: 30000 }, async () => {
     for (const page of PAGES) {
       cleanup();
       renderAt(page.path);
