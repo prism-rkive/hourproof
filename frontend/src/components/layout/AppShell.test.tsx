@@ -1,17 +1,23 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router";
+import { clearApiCache } from "@/lib/api";
 import { routes } from "@/router";
 import { PAGES } from "@/routes";
 import { snapshot } from "@/test/snapshot";
 
 const overview = snapshot("overview") as { demo: { run_id: string } };
+const week = snapshot("week");
 
 function renderAt(path: string) {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) =>
-      url === "/api/overview" ? new Response(JSON.stringify(overview)) : new Response("{}", { status: 404 }),
+      url === "/api/overview"
+        ? new Response(JSON.stringify(overview))
+        : url === "/api/week"
+          ? new Response(JSON.stringify(week))
+          : new Response("{}", { status: 404 }),
     ),
   );
   const router = createMemoryRouter(routes, { initialEntries: [path] });
@@ -20,6 +26,7 @@ function renderAt(path: string) {
 }
 
 afterEach(() => {
+  clearApiCache();
   vi.unstubAllGlobals();
   localStorage.clear();
   document.documentElement.className = "";
@@ -30,7 +37,9 @@ describe("app shell", () => {
     for (const page of PAGES) {
       cleanup();
       renderAt(page.path);
-      expect(await screen.findByRole("heading", { level: 1, name: page.title })).toBeInTheDocument();
+      const h1 = await screen.findByRole("heading", { level: 1 }, { timeout: 5000 }); // first page: cold lazy imports
+      if (page.path === "/") expect(h1).toHaveTextContent(/clean over the year/);
+      else expect(h1).toHaveTextContent(page.title);
       const nav = screen.getAllByRole("navigation", { name: "Main" })[0]!;
       expect(within(nav).getByRole("link", { name: page.label })).toHaveAttribute("aria-current", "page");
       expect(document.title).toBe(page.path === "/" ? "HourProof" : `${page.title} · HourProof`);

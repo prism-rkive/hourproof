@@ -31,7 +31,7 @@ export function MobileMenu() {
         <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
           <RunStatusPill variant="menu" />
           <nav aria-label="Main">
-            <ul className="flex flex-col gap-0.5">
+            <ul className="flex flex-col gap-1">
               {PAGES.map((p) => (
                 <li key={p.path}>
                   <NavLink
@@ -39,14 +39,15 @@ export function MobileMenu() {
                     end={p.path === "/"}
                     className={({ isActive }) =>
                       cn(
-                        "flex h-11 items-center rounded-md px-3 text-base transition-colors",
+                        "flex flex-col gap-0.5 rounded-md px-3 py-2.5 transition-colors",
                         isActive
                           ? "bg-accent font-medium text-foreground"
                           : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
                       )
                     }
                   >
-                    {p.label === p.title || p.path === "/" ? p.label : p.title}
+                    <span className="text-base">{p.path === "/" ? p.label : p.title}</span>
+                    <span className="text-13 leading-snug font-normal text-subtle-foreground">{p.plain}</span>
                   </NavLink>
                 </li>
               ))}

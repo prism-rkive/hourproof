@@ -6,6 +6,13 @@ afterEach(() => cleanup());
 
 window.scrollTo = () => {}; // jsdom does not implement scrolling; <ScrollRestoration> calls it
 
+// jsdom has no layout: Radix and the charts observe element sizes; nothing to observe here.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 // jsdom has no matchMedia: report "no preference" so the theme falls back to dark, as in a browser without one.
 if (!window.matchMedia) {
   window.matchMedia = (query: string) =>

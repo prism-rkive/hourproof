@@ -5,17 +5,52 @@
  */
 import { z } from "zod";
 
-export const RunStatus = z.enum(["running", "done", "failed"]).or(z.string());
+export const Tx = z
+  .object({
+    hash: z.string(),
+    label: z.string(),
+    gas: z.number(),
+    url: z.string().nullish(),
+    block: z.number().nullish(),
+    role: z.string().nullish(),
+  })
+  .passthrough();
+
+export const Step = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    status: z.string(),
+    seconds: z.number().nullish(),
+    detail: z.string().nullish(),
+    metrics: z.record(z.unknown()).default({}),
+    txs: z.array(Tx).default([]),
+  })
+  .passthrough();
+
+export const Attack = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    expected: z.string().nullish(),
+    observed: z.string().nullish(),
+    status: z.string(),
+    note: z.string().nullish(),
+  })
+  .passthrough();
 
 export const DemoState = z
   .object({
     run_id: z.string(),
     network: z.string(),
-    status: RunStatus,
+    status: z.string(),
     mode: z.string().optional(),
     zk_mode: z.string().optional(),
     started_utc: z.string().optional(),
     finished_utc: z.string().nullish(),
+    steps: z.array(Step).default([]),
+    attacks: z.array(Attack).default([]),
+    summary: z.record(z.unknown()).nullish(),
   })
   .passthrough();
 
@@ -29,13 +64,49 @@ export const StaticSnapshot = z
   })
   .passthrough();
 
+export const Dataset = z
+  .object({
+    hourly_match_of_100pct_annual_wind: z.number(),
+    buyer_label: z.string().nullish(),
+    year: z.number().nullish(),
+    hours: z.number().nullish(),
+    source: z.string().nullish(),
+  })
+  .passthrough();
+
 export const Overview = z
   .object({
     running: z.boolean(),
     demo: DemoState.nullable(),
+    dataset: Dataset.nullable(),
+    annual_match: z.number().nullable(),
+    backtest: z.record(z.unknown()).nullable(),
     static_snapshot: StaticSnapshot.optional(),
   })
   .passthrough();
 
+const series = z.array(z.number());
+export const Week = z.union([
+  z.object({ available: z.literal(false) }),
+  z
+    .object({
+      available: z.literal(true),
+      source: z.string(),
+      window_start_utc: z.string(),
+      hours: z.array(z.string()),
+      base_mwh: series,
+      topup_mwh: series,
+      private_agent_load_mwh: series,
+      private_naive_load_mwh: series,
+      coverage_naive: z.number(),
+      coverage_agent: z.number(),
+    })
+    .passthrough(),
+]);
+
 export type Overview = z.infer<typeof Overview>;
 export type DemoState = z.infer<typeof DemoState>;
+export type Step = z.infer<typeof Step>;
+export type Tx = z.infer<typeof Tx>;
+export type Week = z.infer<typeof Week>;
+export type WeekData = Extract<Week, { available: true }>;

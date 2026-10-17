@@ -1,14 +1,17 @@
 import { createBrowserRouter, type RouteObject } from "react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import { RouteError } from "@/components/ErrorState";
-import { fetchOverview } from "@/lib/api";
+import { getOverview } from "@/lib/api";
 import type { Overview } from "@/lib/schemas";
 
 export type RootData = { overview: Promise<Overview> };
 
-/** The overview is shared by the whole shell (run status, footer). Not awaited: the shell renders immediately. */
-export function rootLoader({ request }: { request: Request }): RootData {
-  const overview = fetchOverview(request.signal);
+/**
+ * The overview is shared by the whole shell (run status, footer) and the pages (same cached request). Not awaited:
+ * the shell renders immediately. Fresh on every call, so revalidating while a local run is in progress updates it.
+ */
+export function rootLoader(): RootData {
+  const overview = getOverview(true);
   overview.catch(() => {}); // handled where it is rendered (<Await errorElement>)
   return { overview };
 }

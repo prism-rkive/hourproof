@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import { Overview } from "./schemas";
+import { Overview, Week } from "./schemas";
 
 export class ApiError extends Error {
   constructor(
@@ -12,12 +12,11 @@ export class ApiError extends Error {
   }
 }
 
-async function getJSON<S extends z.ZodTypeAny>(path: string, schema: S, signal?: AbortSignal): Promise<z.infer<S>> {
+async function getJSON<S extends z.ZodTypeAny>(path: string, schema: S): Promise<z.infer<S>> {
   let res: Response;
   try {
-    res = await fetch(path, { signal, headers: { Accept: "application/json" } });
-  } catch (e) {
-    if (signal?.aborted) throw e;
+    res = await fetch(path, { headers: { Accept: "application/json" } });
+  } catch {
     throw new ApiError(`Could not reach ${path}`, path);
   }
   if (!res.ok) throw new ApiError(`${path} answered HTTP ${res.status}`, path, res.status);
@@ -32,4 +31,23 @@ async function getJSON<S extends z.ZodTypeAny>(path: string, schema: S, signal?:
   return parsed.data;
 }
 
-export const fetchOverview = (signal?: AbortSignal) => getJSON("/api/overview", Overview, signal);
+/**
+ * One request per endpoint per page load, shared by the shell and every page (the files are static snapshots on the
+ * host). `fresh` re-fetches, for the live local server while a run is in progress.
+ */
+const cache = new Map<string, Promise<unknown>>();
+function cached<S extends z.ZodTypeAny>(path: string, schema: S, fresh = false): Promise<z.infer<S>> {
+  if (fresh || !cache.has(path)) {
+    const p = getJSON(path, schema);
+    p.catch(() => cache.delete(path)); // a failed request is retried next time
+    cache.set(path, p);
+  }
+  return cache.get(path) as Promise<z.infer<S>>;
+}
+
+export const getOverview = (fresh = false) => cached("/api/overview", Overview, fresh);
+export const getWeek = (fresh = false) => cached("/api/week", Week, fresh);
+
+export function clearApiCache() {
+  cache.clear();
+}

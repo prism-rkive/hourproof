@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Outlet, ScrollRestoration, useLocation, useNavigation } from "react-router";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Footer } from "./Footer";
 import { TopNav } from "./TopNav";
@@ -42,16 +43,18 @@ export function AppShell() {
   }, [pathname, hash]);
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <SkipLink />
-      <RouteProgress />
-      <TopNav />
-      <main id="main" ref={main} tabIndex={-1} className="flex-1 focus:outline-none">
-        <Outlet />
-      </main>
-      <Footer />
-      <ScrollRestoration />
-    </div>
+    <TooltipProvider delayDuration={350} skipDelayDuration={200}>
+      <div className="flex min-h-dvh flex-col">
+        <SkipLink />
+        <RouteProgress />
+        <TopNav />
+        <main id="main" ref={main} tabIndex={-1} className="flex-1 focus:outline-none">
+          <Outlet />
+        </main>
+        <Footer />
+        <ScrollRestoration />
+      </div>
+    </TooltipProvider>
   );
 }
 
