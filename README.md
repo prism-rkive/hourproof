@@ -14,7 +14,8 @@ the submitted transactions. Evidence, every transaction and file hash: [`evidenc
 the two earlier attempts that failed, why, and the fixes: [`docs/BASE_SEPOLIA.md`](docs/BASE_SEPOLIA.md).
 Re-check it yourself, read-only, without any key: `make verify-evidence`.
 
-<!-- DASHBOARD_URL -->
+**Live dashboard: https://hourproof-phi.vercel.app**, a static snapshot of that verified run (every transaction
+links to BaseScan). See [Deploy the dashboard](#deploy-the-dashboard-vercel).
 
 ## Results in one table (real Energinet data, TEST = Jul–Dec 2025, run once)
 
