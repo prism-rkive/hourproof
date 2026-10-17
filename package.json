@@ -1,0 +1,9 @@
+{
+  "name": "hourproof-site",
+  "private": true,
+  "description": "Build settings for the hosted dashboard only (Vercel reads the Node version here). The project itself is Python, Foundry and Noir; the dashboard lives in frontend/.",
+  "engines": {
+    "node": "22.x"
+  },
+  "packageManager": "npm@11.20.0"
+}

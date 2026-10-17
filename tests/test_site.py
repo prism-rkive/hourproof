@@ -16,20 +16,50 @@ SNAP = ROOT / "deploy" / "snapshot"
 
 
 class VercelConfigTests(unittest.TestCase):
+    def rewrites(self):
+        return {r["source"]: r["destination"] for r in json.loads((ROOT / "vercel.json").read_text())["rewrites"]}
+
     def test_every_api_path_the_frontend_reads_is_rewritten_to_a_snapshot(self):
-        js = (ROOT / "web" / "app.js").read_text() + (ROOT / "web" / "carbon.js").read_text()
-        read = set(re.findall(r'(?:getJSON|fetch)\("(/api/[a-z]+)"\)', js))
-        self.assertEqual(read, {"/api/overview", "/api/week", "/api/carbon"})
-        rewrites = {r["source"]: r["destination"] for r in json.loads((ROOT / "vercel.json").read_text())["rewrites"]}
+        src = "".join(p.read_text(encoding="utf-8") for p in (ROOT / "frontend" / "src").rglob("*.ts*")
+                      if ".test." not in p.name)
+        read = set(re.findall(r'"(/api/[a-z/]+)"', src))
+        self.assertIn("/api/overview", read)
+        rewrites = self.rewrites()
         for path in read:
-            self.assertEqual(rewrites[path], path + ".json")
-            self.assertTrue((SNAP / Path(path).name).with_suffix(".json").is_file(), path)
+            self.assertIn(path, rewrites, path)
+            self.assertTrue((SNAP / Path(rewrites[path]).name).is_file(), path)
+
+    def test_local_dev_server_maps_the_same_api_paths_as_the_host(self):
+        dev = dict(re.findall(r'"(/api/[a-z/]+)": "([a-z]+\.json)"', (ROOT / "frontend" / "snapshot-api.ts").read_text()))
+        host = {k: Path(v).name for k, v in self.rewrites().items() if k.startswith("/api/")}
+        self.assertEqual(dev, host)
+
+    def test_spa_fallback_serves_the_app_for_every_page_but_not_for_the_api(self):
+        rules = json.loads((ROOT / "vercel.json").read_text())["rewrites"]
+        self.assertEqual(rules[-1]["destination"], "/index.html")  # last: real files and /api rules win first
+        fallback = re.compile("^" + rules[-1]["source"] + "$")
+        for page in ("/", "/proof", "/security", "/agent", "/carbon", "/note", "/method", "/no-such-page"):
+            self.assertTrue(fallback.match(page), page)
+        self.assertFalse(fallback.match("/api/missing"))
+
+    def test_build_uses_the_pinned_node_and_npm(self):
+        vercel = json.loads((ROOT / "vercel.json").read_text())
+        pkg = json.loads((ROOT / "frontend" / "package.json").read_text())
+        npm = pkg["packageManager"].removeprefix("npm@")
+        self.assertIn(f"npx --yes npm@{npm} ci", vercel["installCommand"])
+        self.assertEqual(json.loads((ROOT / "package.json").read_text())["engines"]["node"], "22.x")  # Vercel reads this
+        self.assertTrue(pkg["engines"]["node"].startswith(">=22."))
+        self.assertIn("engine-strict=true", (ROOT / "frontend" / ".npmrc").read_text())
+        lock = json.loads((ROOT / "frontend" / "package-lock.json").read_text())
+        self.assertEqual(lock["packages"][""]["engines"], pkg["engines"])
 
     def test_vercel_uploads_only_the_frontend(self):
         ignore = (ROOT / ".vercelignore").read_text().split()
-        self.assertEqual(ignore[ignore.index("/*") + 1:][:3], ["!/web", "!/deploy", "!/scripts"])
-        self.assertNotIn("!/data", ignore)
-        self.assertNotIn("!/.env", ignore)
+        allowed = [l for l in ignore if l.startswith("!")]
+        self.assertEqual(allowed, ["!/frontend", "!/deploy", "!/scripts", "!/scripts/build_site.sh", "!/vercel.json",
+                                   "!/package.json"])
+        for local in ("/frontend/node_modules", "/frontend/dist"):
+            self.assertIn(local, ignore)
 
 
 class SnapshotTests(unittest.TestCase):
@@ -108,14 +138,18 @@ class SnapshotTests(unittest.TestCase):
                 site.export(ev, ev / "out")
 
 
-@unittest.skipUnless(shutil.which("bash"), "needs bash")
+@unittest.skipUnless(shutil.which("bash") and shutil.which("node") and (ROOT / "frontend" / "node_modules").is_dir(),
+                     "needs bash, node and the frontend dependencies (cd frontend && npx npm@11.20.0 ci)")
 class BuildScriptTests(unittest.TestCase):
     def test_build_produces_the_static_site(self):
         out = subprocess.run(["bash", "scripts/build_site.sh"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(out.returncode, 0, out.stderr)
-        files = sorted(p.relative_to(ROOT / "site").as_posix() for p in (ROOT / "site").rglob("*") if p.is_file())
-        self.assertEqual(files, ["api/carbon.json", "api/overview.json", "api/week.json", "index.html",
-                                 "static/app.js", "static/carbon.js", "static/styles.css"])
+        files = {p.relative_to(ROOT / "site").as_posix() for p in (ROOT / "site").rglob("*") if p.is_file()}
+        self.assertTrue({"index.html", "favicon.svg", "api/overview.json", "api/week.json", "api/carbon.json",
+                         "api/log.json"} <= files)
+        self.assertTrue(any(re.fullmatch(r"assets/index-[\w-]+\.js", f) for f in files))
+        for name in ("overview", "week", "carbon", "log"):
+            self.assertEqual((ROOT / "site" / "api" / f"{name}.json").read_bytes(), (SNAP / f"{name}.json").read_bytes())
 
 
 if __name__ == "__main__":
