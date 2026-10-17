@@ -160,5 +160,6 @@ export type Overview = z.infer<typeof Overview>;
 export type DemoState = z.infer<typeof DemoState>;
 export type Step = z.infer<typeof Step>;
 export type Tx = z.infer<typeof Tx>;
+export type Attack = z.infer<typeof Attack>;
 export type Week = z.infer<typeof Week>;
 export type WeekData = Extract<Week, { available: true }>;
