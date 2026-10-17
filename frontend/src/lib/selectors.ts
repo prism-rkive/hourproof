@@ -1,5 +1,5 @@
 /** Pure functions from API data to what the UI shows. Every displayed figure is derived here, and tested. */
-import { int, networkName, pct, pctShort, utcDateTime } from "./format";
+import { int, networkName, pct, pctShort, utcDateTime, weekScope } from "./format";
 import type { DemoState, Overview, Step, WeekData } from "./schemas";
 
 export type Tone = "success" | "warning" | "danger" | "neutral";
@@ -61,6 +61,7 @@ export function metric(demo: DemoState | null | undefined, stepId: string, key: 
 
 export type RunFigures = {
   provenBps?: number; // coverage proven on-chain (lower bound)
+  naiveBps?: number; // the run's coverage with the fixed portfolio, private (whole-MWh certificates)
   truePrivateBps?: number; // the buyer's true coverage, private
   provenResidualKg?: number; // residual emissions proven on-chain (upper bound)
   targetResidualKg?: number; // the note's KPI target
@@ -74,6 +75,7 @@ export function runFigures(demo: DemoState | null | undefined): RunFigures {
   const note = step(demo, "note")?.metrics ?? {};
   return {
     provenBps: metric(demo, "prove", "proven_bps"),
+    naiveBps: typeof demo?.summary?.coverage_naive_bps === "number" ? demo.summary.coverage_naive_bps : undefined,
     truePrivateBps: metric(demo, "prove", "true_coverage_private_bps"),
     provenResidualKg: metric(demo, "prove_emissions", "proven_residual_kg"),
     targetResidualKg: metric(demo, "note", "target_residual_kg"),
@@ -82,6 +84,12 @@ export function runFigures(demo: DemoState | null | undefined): RunFigures {
     couponPaid: metric(demo, "note", "coupon_paid_tusd"),
     notes: metric(demo, "note", "notes_subscribed"),
   };
+}
+
+/** The scope label of the run's week ("Week of 10–16 Nov"), from the run's own window. */
+export function runWeekScope(demo: DemoState | null | undefined): string | undefined {
+  const start = (demo as { window?: { window_start_utc?: unknown } } | null | undefined)?.window?.window_start_utc;
+  return typeof start === "string" ? weekScope(start) : undefined;
 }
 
 /* ------------------------------------------------------------------------------------------------ hero */

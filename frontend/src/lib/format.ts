@@ -62,6 +62,19 @@ export function dayLabel(hour: string, short = false): string {
   );
 }
 
+/** "Week of 10–16 Nov" (or "Week of 28 Nov – 4 Dec") for the 7 days starting at a dataset hour string, UTC. */
+export function weekScope(startHour: string): string {
+  const start = utcHour(startHour);
+  const end = new Date(start.getTime() + 6 * 86_400_000);
+  const d = (x: Date) => x.getUTCDate();
+  const m = (x: Date) => x.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
+  return m(start) === m(end)
+    ? `Week of ${d(start)}–${d(end)} ${m(end)}`
+    : `Week of ${d(start)} ${m(start)} – ${d(end)} ${m(end)}`;
+}
+
+export const FULL_YEAR = "Full year";
+
 /** "Mon" (UTC). */
 export function weekday(hour: string): string {
   return utcHour(hour).toLocaleDateString("en-GB", { weekday: "short", timeZone: "UTC" });

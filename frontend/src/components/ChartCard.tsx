@@ -1,6 +1,7 @@
 import { Table2 } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { ScopeTag } from "./ScopeTag";
 
 /**
  * A titled panel for a chart: what it shows in one sentence, the chart, an optional "View as table" with the same
@@ -14,6 +15,7 @@ export function ChartCard({
   source,
   actions,
   footer,
+  scope,
   className,
 }: {
   title: ReactNode;
@@ -23,14 +25,19 @@ export function ChartCard({
   source?: ReactNode;
   actions?: ReactNode;
   footer?: ReactNode;
+  scope?: string; // the period every figure in this card covers
   className?: string;
 }) {
   const [showTable, setShowTable] = useState(false);
   const tableId = useId();
   return (
-    <section className={cn("flex flex-col rounded-xl border border-border bg-card shadow-xs", className)}>
+    <section
+      data-scope={scope}
+      className={cn("flex flex-col rounded-xl border border-border bg-card shadow-xs", className)}
+    >
       <div className="flex flex-col gap-4 p-5 pb-0 sm:flex-row sm:items-start sm:justify-between">
-        <div className="max-w-2xl space-y-1">
+        <div className="max-w-2xl space-y-1.5">
+          {scope && <ScopeTag scope={scope} />}
           <h3 className="text-base font-semibold tracking-tight">{title}</h3>
           {description && <p className="text-sm text-pretty text-muted-foreground">{description}</p>}
         </div>

@@ -4,6 +4,7 @@ import { Link, useLoaderData } from "react-router";
 import { ChartCard, DataTable } from "@/components/ChartCard";
 import { HourlyChart } from "@/components/charts";
 import { KpiCard } from "@/components/KpiCard";
+import { ScopeTag } from "@/components/ScopeTag";
 import { Page } from "@/components/layout/AppShell";
 import { SegmentedControl } from "@/components/SegmentedControl";
 import { Term } from "@/components/Term";
@@ -11,9 +12,9 @@ import { Button } from "@/components/ui/button";
 import { WeekHeatmap } from "@/components/WeekHeatmap";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { getOverview, getWeek } from "@/lib/api";
-import { bps, dayLabel, int, networkName, pct, pctShort, tonnes } from "@/lib/format";
+import { bps, dayLabel, FULL_YEAR, int, networkName, pct, pctShort, tonnes, weekScope } from "@/lib/format";
 import type { Overview, Week, WeekData } from "@/lib/schemas";
-import { hero, runFigures, weekView, type WeekMode } from "@/lib/selectors";
+import { hero, runFigures, runWeekScope, weekView, type WeekMode } from "@/lib/selectors";
 import { pageMeta } from "@/routes";
 
 export async function loader() {
@@ -43,8 +44,11 @@ function Hero({ o }: { o: Overview }) {
   const hourly = o.dataset?.hourly_match_of_100pct_annual_wind;
   return (
     <section className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-14">
-      <div>
-        <p className="text-13 font-medium text-brand">Hourly clean-energy claims</p>
+      <div data-scope={FULL_YEAR}>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-13 font-medium text-brand">Hourly clean-energy claims</p>
+          <ScopeTag scope={FULL_YEAR} />
+        </div>
         <h1 className="mt-4 text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
           <span className="block">{h?.annual ?? "Clean over the year."}</span>
           <span className="block text-muted-foreground">{h?.hourly ?? "Hour by hour?"}</span>
@@ -62,8 +66,11 @@ function Hero({ o }: { o: Overview }) {
         </div>
       </div>
       {annual != null && hourly != null && (
-        <figure className="m-0 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <figcaption className="text-sm font-medium">The same purchase, counted two ways</figcaption>
+        <figure data-scope={FULL_YEAR} className="m-0 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <figcaption className="flex items-start justify-between gap-3 text-sm font-medium">
+            The same purchase, counted two ways
+            <ScopeTag scope={FULL_YEAR} />
+          </figcaption>
           <div className="mt-6 space-y-5">
             <MatchBar label="Counted over the year" value={annual} />
             <MatchBar label="Counted hour by hour" value={hourly} />
@@ -160,6 +167,7 @@ function KeyResults({ o }: { o: Overview }) {
   const f = runFigures(o.demo);
   const hourly = o.dataset?.hourly_match_of_100pct_annual_wind;
   const demo = o.demo;
+  const week = runWeekScope(demo) ?? "The run's week";
   return (
     <section aria-labelledby="results-h">
       <SectionHeading
@@ -167,12 +175,13 @@ function KeyResults({ o }: { o: Overview }) {
         title="Key results"
         sub={
           demo
-            ? `The first two over the whole year of data; the rest from run ${demo.run_id} on ${networkName(demo.network)}.`
-            : "Over the whole year of data."
+            ? `Each figure shows the period it covers. The weekly figures come from run ${demo.run_id} on ${networkName(demo.network)}.`
+            : "Each figure shows the period it covers."
         }
       />
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <KpiCard
+          scope={FULL_YEAR}
           label="Clean energy bought, over the year"
           value={o.annual_match != null ? pctShort(o.annual_match) : undefined}
           hint="Wind certificates bought, divided by electricity used, both totalled over the whole year."
@@ -180,6 +189,7 @@ function KeyResults({ o }: { o: Overview }) {
           linkLabel="Data and method"
         />
         <KpiCard
+          scope={FULL_YEAR}
           label="Matched hour by hour, over the year"
           value={hourly != null ? pct(hourly) : undefined}
           hint={
@@ -193,6 +203,7 @@ function KeyResults({ o }: { o: Overview }) {
         />
         <KpiCard
           emphasis
+          scope={week}
           label="Coverage proven on-chain"
           qualifier="≥"
           value={f.provenBps != null ? bps(f.provenBps) : undefined}
@@ -206,6 +217,7 @@ function KeyResults({ o }: { o: Overview }) {
           linkLabel="See the proof"
         />
         <KpiCard
+          scope={week}
           label="True coverage (private)"
           value={f.truePrivateBps != null ? bps(f.truePrivateBps) : undefined}
           hint="The exact figure, known only to the buyer. Shown here because this demo plays the buyer; the chain only learns the proven bound."
@@ -214,6 +226,7 @@ function KeyResults({ o }: { o: Overview }) {
         />
         <KpiCard
           emphasis
+          scope={week}
           label="Residual emissions proven"
           qualifier="≤"
           value={f.provenResidualKg != null ? `${tonnes(f.provenResidualKg)} CO₂` : undefined}
@@ -227,6 +240,7 @@ function KeyResults({ o }: { o: Overview }) {
           linkLabel="Carbon-aware load"
         />
         <KpiCard
+          scope={week}
           label={
             <>
               Note <Term id="coupon">coupon</Term>
@@ -254,6 +268,8 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
   const [mode, setMode] = useState<WeekMode>("naive");
   const v = weekView(week, mode);
   const f = runFigures(o.demo);
+  const scope = runWeekScope(o.demo) ?? weekScope(week.window_start_utc);
+  const runBps = mode === "agent" ? f.truePrivateBps : f.naiveBps; // the run's figure leads; the heatmap's is in the caption
   const days = Array.from({ length: v.cells.length / 24 }, (_, d) => v.cells.slice(d * 24, d * 24 + 24));
   const explain = MODES.find((m) => m.value === mode)!.explain;
   const hourlyRows = v.cells.map((c) => [`${dayLabel(c.hour)} ${c.hour.slice(11, 16)}`, int(c.cert), int(c.load)]);
@@ -265,13 +281,19 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
         sub="Each square is one hour of the run's week. The green part is how much of that hour's use was covered by certificates from the same hour."
       />
       <ChartCard
+        scope={scope}
         title={
           <>
-            <span className="tabular">{pct(v.coverage)}</span>{" "}
-            <span className="font-normal text-muted-foreground">of this week's use covered, hour by hour</span>
+            <span className="tabular">{runBps != null ? bps(runBps) : pct(v.coverage)}</span>{" "}
+            <span className="font-normal text-muted-foreground">of the week's use covered, hour by hour</span>
           </>
         }
-        description={explain}
+        description={
+          <>
+            {explain} The figure is the run's, from its on-chain certificates
+            {mode === "agent" ? " (the buyer's private value; the chain only learns the proven bound)" : ""}.
+          </>
+        }
         actions={
           <SegmentedControl
             label="Strategy"
@@ -280,7 +302,12 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
             options={MODES.map(({ value, label }) => ({ value, label }))}
           />
         }
-        source={v.caption}
+        source={
+          <>
+            {v.caption} This heatmap figure uses the backtest's fractional MWh; the run issued certificates in whole
+            MWh, so the run's figure above differs slightly.
+          </>
+        }
         table={
           <DataTable
             caption="Share of each hour's use covered by certificates"
@@ -294,6 +321,7 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <ChartCard
+          scope={scope}
           title="What the chain sees"
           description="Certificates cancelled per hour, and a proof that coverage is at least the target. Nothing about consumption."
           table={
@@ -305,7 +333,7 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
           }
           footer={
             <ProofLine
-              label="Proven on-chain"
+              label="Proven on-chain, by the run (with the agent)"
               value={f.provenBps != null ? `coverage ≥ ${bps(f.provenBps)}` : "no proof on-chain yet"}
             />
           }
@@ -313,6 +341,7 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
           <HourlyChart hours={week.hours} bars={v.cert} barLabel="Certificates" ariaLabel="Certificates per hour" />
         </ChartCard>
         <ChartCard
+          scope={scope}
           title="What only the buyer sees"
           description="The metered load. It stays with the buyer and the data hub; only a commitment to it is published."
           table={
@@ -324,7 +353,7 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
           }
           footer={
             <ProofLine
-              label="True coverage, private"
+              label="True coverage, private (the run, with the agent)"
               value={f.truePrivateBps != null ? bps(f.truePrivateBps) : "—"}
               legend
             />
@@ -340,10 +369,6 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
           />
         </ChartCard>
       </div>
-      <p className="text-xs leading-relaxed text-subtle-foreground">
-        The proof figures come from the on-chain run, which used the agent. The heatmap and charts use the backtest's
-        hourly MWh; the run issued certificates in whole MWh, so its coverage differs slightly from the week figure.
-      </p>
     </section>
   );
 }

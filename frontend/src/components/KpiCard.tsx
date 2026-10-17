@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { cn } from "@/lib/utils";
+import { ScopeTag } from "./ScopeTag";
 
 /**
  * One headline figure: what it is, the value, and a sentence on what it means. `qualifier` is the proof's direction
@@ -15,6 +16,7 @@ export function KpiCard({
   href,
   linkLabel = "Details",
   emphasis = false,
+  scope,
   className,
 }: {
   label: ReactNode;
@@ -24,17 +26,22 @@ export function KpiCard({
   href?: string;
   linkLabel?: string;
   emphasis?: boolean;
+  scope: string; // the period the figure covers, shown next to it
   className?: string;
 }) {
   return (
     <div
+      data-scope={scope}
       className={cn(
         "flex flex-col rounded-xl border border-border bg-card p-5 shadow-xs",
         emphasis && "border-brand/40 bg-brand-subtle/40",
         className,
       )}
     >
-      <div className="text-13 text-muted-foreground">{label}</div>
+      <div className="flex items-start justify-between gap-3">
+        <div className="text-13 text-muted-foreground">{label}</div>
+        <ScopeTag scope={scope} />
+      </div>
       <div className="mt-2 flex items-baseline gap-1.5">
         {qualifier && value && <span className="text-2xl font-medium text-muted-foreground">{qualifier}</span>}
         <span className="tabular text-3xl font-semibold tracking-tight">{value ?? "—"}</span>
