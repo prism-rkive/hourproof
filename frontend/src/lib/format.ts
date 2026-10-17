@@ -73,6 +73,22 @@ export function weekScope(startHour: string): string {
     : `Week of ${d(start)} ${m(start)} – ${d(end)} ${m(end)}`;
 }
 
+/** "Weeks of 6 Oct – 2 Nov" for whole weeks starting at the first and last given week starts (UTC dates). */
+export function weeksScope(firstWeek: string, lastWeek: string): string {
+  const day = (iso: string, plus = 0) =>
+    new Date(new Date(iso.slice(0, 10) + "T00:00:00Z").getTime() + plus * 86_400_000).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    });
+  return `Weeks of ${day(firstWeek)} – ${day(lastWeek, 6)}`;
+}
+
+/** "17 Oct 2026, 14:29 UTC" from Unix seconds. */
+export function unixUtc(seconds: number): string {
+  return utcDateTime(new Date(seconds * 1000).toISOString());
+}
+
 export const FULL_YEAR = "Full year";
 export const THIS_RUN = "This run";
 
