@@ -38,8 +38,8 @@ export function KpiCard({
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="text-13 text-muted-foreground">{label}</div>
+      <div className="flex flex-wrap-reverse items-start justify-between gap-2">
+        <div className="min-w-[9rem] flex-1 text-13 text-muted-foreground">{label}</div>
         <ScopeTag scope={scope} />
       </div>
       <div className="mt-2 flex items-baseline gap-1.5">

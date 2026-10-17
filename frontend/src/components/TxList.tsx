@@ -21,16 +21,16 @@ function explorer(url: string): string {
 export function TxList({ txs, className }: { txs: Tx[]; className?: string }) {
   if (!txs.length) return null;
   return (
-    <ul className={cn("divide-y divide-border overflow-hidden rounded-lg border border-border", className)}>
+    <ul className={cn("@container divide-y divide-border overflow-hidden rounded-lg border border-border", className)}>
       {txs.map((t) => (
         <li
           key={t.hash}
-          className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 bg-card px-3 py-2 text-13 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
+          className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 bg-card px-3 py-2 text-13 @2xl:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
         >
           <span className="min-w-0 truncate" title={t.label}>
             {t.label}
           </span>
-          <span className="flex items-center gap-0.5 justify-self-end sm:order-3">
+          <span className="flex items-center gap-0.5 justify-self-end @2xl:order-3">
             {t.url ? (
               <a
                 href={t.url}
@@ -50,7 +50,7 @@ export function TxList({ txs, className }: { txs: Tx[]; className?: string }) {
             )}
             <CopyButton value={t.hash} label={`Copy the hash of "${t.label}"`} />
           </span>
-          <span className="tabular col-span-2 text-xs text-subtle-foreground sm:order-2 sm:col-span-1 sm:text-right">
+          <span className="tabular col-span-2 text-xs text-subtle-foreground @2xl:order-2 @2xl:col-span-1 @2xl:text-right">
             {t.block != null && <>block {int(t.block)} · </>}
             {int(t.gas)} gas
           </span>
