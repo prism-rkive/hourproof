@@ -7,6 +7,7 @@ import { HourlyChart } from "@/components/charts";
 import { KpiCard } from "@/components/KpiCard";
 import { ScopeTag } from "@/components/ScopeTag";
 import { Page } from "@/components/layout/AppShell";
+import { WithSector } from "@/components/SectorName";
 import { SegmentedControl } from "@/components/SegmentedControl";
 import { Term } from "@/components/Term";
 import { Button } from "@/components/ui/button";
@@ -54,7 +55,11 @@ function Hero({ o }: { o: Overview }) {
           <span className="block">{h?.annual ?? "Clean over the year."}</span>
           <span className="block text-muted-foreground">{h?.hourly ?? "Hour by hour?"}</span>
         </h1>
-        {h && <p className="mt-6 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">{h.lede}</p>}
+        {h && (
+          <p className="mt-6 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
+            <WithSector text={h.lede} sector={h.sector} />
+          </p>
+        )}
         <div className="mt-8 flex flex-wrap gap-3">
           <Button asChild variant="brand" size="lg">
             <Link to="/proof">

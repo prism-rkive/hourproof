@@ -1,6 +1,7 @@
 /** Pure functions from API data to what the UI shows. Every displayed figure is derived here, and tested. */
 import { int, networkName, pct, pctShort, utcDateTime, weekScope } from "./format";
 import type { DemoState, Overview, Step, WeekData } from "./schemas";
+import { sector, type Sector } from "./sector";
 
 export type Tone = "success" | "warning" | "danger" | "neutral";
 
@@ -198,14 +199,19 @@ export function runWeekScope(demo: DemoState | null | undefined): string | undef
 
 /* ------------------------------------------------------------------------------------------------ hero */
 
-export type Hero = { annual: string; hourly: string; lede: string } | null;
+export type Hero = { annual: string; hourly: string; lede: string; sector: Sector | null } | null;
 
 /** The headline and lede. Wording of the original page; the annual figure now comes from the data too. */
 export function hero(o: Overview): Hero {
   const ds = o.dataset;
   if (!ds || o.annual_match == null) return null;
   const hourly = pct(ds.hourly_match_of_100pct_annual_wind);
-  const buyer = ds.buyer_label ? `Denmark's ${ds.buyer_label} sector, as one buyer,` : "A buyer";
+  const sec = sector(ds.buyer_branch, ds.buyer_label);
+  const buyer = sec
+    ? `The ${sec.label}, as one buyer,`
+    : ds.buyer_label
+      ? `Denmark's ${ds.buyer_label} sector, as one buyer,`
+      : "A buyer";
   const buys =
     o.annual_match === 1
       ? "buys exactly its yearly consumption"
@@ -217,6 +223,7 @@ export function hero(o: Overview): Hero {
       `${buyer} ${buys} in Danish wind${ds.year ? ` (${ds.year})` : ""}. Hour by hour, only ${hourly} of its ` +
       "consumption is met by wind produced in that same hour. HourProof makes each hour's certificate count once, " +
       "proves the hourly match without revealing consumption, and lets an AI agent close the gap.",
+    sector: sec,
   };
 }
 

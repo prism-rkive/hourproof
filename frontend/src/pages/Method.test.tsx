@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { GLOSSARY } from "@/content/glossary";
 import { LIMITS } from "@/content/limits";
 import { figuresWithoutScope, renderRoute } from "@/test/render";
@@ -48,6 +49,16 @@ describe("Method", () => {
         k.url,
       );
     }
+  });
+
+  it("names the buyer in English, with Energinet's Danish name on demand", async () => {
+    await renderRoute("/method");
+    const raw = (snapshot("overview") as any).dataset.buyer_label;
+    const main = document.getElementById("main")!;
+    expect(main).toHaveTextContent("Danish telecommunications and IT services sector (Energinet branch JB_JC)");
+    expect(main).not.toHaveTextContent(raw);
+    await userEvent.click(screen.getByRole("button", { name: /Danish telecommunications and IT services sector/ }));
+    expect(await screen.findByRole("dialog")).toHaveTextContent(raw);
   });
 
   it("labels the period of every figure", async () => {

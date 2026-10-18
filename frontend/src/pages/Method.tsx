@@ -5,12 +5,14 @@ import { Page } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ScopeTag } from "@/components/ScopeTag";
 import { SectionHeading } from "@/components/SectionHeading";
+import { SectorName } from "@/components/SectorName";
 import { Term } from "@/components/Term";
 import { GLOSSARY } from "@/content/glossary";
 import { LIMITS } from "@/content/limits";
 import { getCarbon, getOverview } from "@/lib/api";
 import { FULL_YEAR, int, pct, shortHash, THIS_RUN } from "@/lib/format";
 import type { Carbon, Overview } from "@/lib/schemas";
+import { sector } from "@/lib/sector";
 import { metric, slimOverview } from "@/lib/selectors";
 import { DATA_SOURCE_URL } from "@/routes";
 
@@ -77,6 +79,7 @@ function Card({
 export function Component() {
   const { overview: o, carbon: c } = useLoaderData() as { overview: Overview; carbon: Carbon };
   const ds = o.dataset as (Record<string, unknown> & { source?: string; datasets?: string[] }) | null;
+  const buyer = ds && sector(ds.buyer_branch, ds.buyer_label);
   const bt = o.backtest as { params?: Record<string, number>; portfolio_share_k?: number } | null;
   const zk = (o as { zk?: { nargo?: string; bb?: string; runtime_bytes?: Record<string, number> } | null }).zk;
   const demo = o.demo;
@@ -126,7 +129,16 @@ export function Component() {
                 ],
                 ["Datasets", (ds.datasets ?? []).join(", ")],
                 ["Period", `${String(ds.first)} to ${String(ds.last)} UTC (${int(Number(ds.hours))} hours)`],
-                ["Buyer", `${String(ds.buyer_label)} (Energinet branch ${String(ds.buyer_branch)})`],
+                [
+                  "Buyer",
+                  buyer ? (
+                    <>
+                      <SectorName sector={buyer} /> (Energinet branch {buyer.code})
+                    </>
+                  ) : (
+                    `${String(ds.buyer_label)} (Energinet branch ${String(ds.buyer_branch)})`
+                  ),
+                ],
                 ["Annual load", `${int(Number(ds.annual_load_mwh))} MWh`],
                 ["Declaration version", String(ds.declaration_version)],
                 ["Synthetic data", ds.synthetic ? "Yes" : "No: every hour is published Energinet data"],

@@ -19,8 +19,23 @@ describe("hero", () => {
     expect(raw.annual_match).toBe(1);
     expect(h.annual).toBe("100% clean over the year.");
     expect(h.hourly).toBe(`${(100 * raw.dataset.hourly_match_of_100pct_annual_wind).toFixed(1)}% hour by hour.`);
-    expect(h.lede).toContain(`Denmark's ${raw.dataset.buyer_label} sector, as one buyer, buys exactly its yearly`);
+    expect(h.lede).toContain(
+      "The Danish telecommunications and IT services sector, as one buyer, buys exactly its yearly",
+    );
+    // the data keeps Energinet's Danish title as published; the site offers it next to the English name
+    expect(raw.dataset.buyer_label).toBe("Telekommunikation &It - og informationstjenester");
+    expect(h.sector).toEqual({
+      label: "Danish telecommunications and IT services sector",
+      original: raw.dataset.buyer_label,
+      code: "JB_JC",
+    });
     expect(h.lede).toContain(`(${raw.dataset.year})`);
+  });
+
+  it("falls back to Energinet's title for a branch without an English name", () => {
+    const other = { ...o, dataset: { ...o.dataset!, buyer_branch: "XX Some branch", buyer_label: "Some branch" } };
+    expect(hero(other)!.lede).toContain("Denmark's Some branch sector, as one buyer,");
+    expect(hero(other)!.sector).toBeNull();
   });
 
   it("does not claim 'exactly' if the annual match were not 100 %", () => {

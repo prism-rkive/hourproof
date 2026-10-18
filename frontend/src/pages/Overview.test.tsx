@@ -31,6 +31,16 @@ describe("Overview", () => {
     expect(o.demo.window.window_start_utc.slice(0, 10)).toBe("2025-11-10"); // the label comes from this
   });
 
+  it("names the buyer in English, with Energinet's Danish name on demand", async () => {
+    await renderRoute("/");
+    const raw = (snapshot("overview") as any).dataset.buyer_label;
+    const lede = screen.getByText(/as one buyer, buys exactly its yearly consumption/);
+    expect(lede).toHaveTextContent(/^The Danish telecommunications and IT services sector, as one buyer,/);
+    expect(document.getElementById("main")).not.toHaveTextContent(raw);
+    await userEvent.click(within(lede).getByRole("button"));
+    expect(await screen.findByRole("dialog")).toHaveTextContent(raw);
+  });
+
   it("leads the week with the run's figures; the heatmap's are only in its caption", async () => {
     await renderRoute("/");
     const card = screen.getByRole("radiogroup", { name: "Strategy" }).closest("section")!;
