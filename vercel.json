@@ -25,7 +25,7 @@
     },
     {
       "source": "/((?!api/).*)",
-      "destination": "/spa.html"
+      "destination": "/spa"
     }
   ],
   "headers": [

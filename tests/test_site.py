@@ -42,7 +42,7 @@ class VercelConfigTests(unittest.TestCase):
 
     def test_spa_fallback_serves_the_app_for_every_page_but_not_for_the_api(self):
         rules = json.loads((ROOT / "vercel.json").read_text())["rewrites"]
-        self.assertEqual(rules[-1]["destination"], "/spa.html")  # last: real files and /api rules win first
+        self.assertEqual(rules[-1]["destination"], "/spa")  # spa.html (cleanUrls); last, so files and /api win first
         self.assertTrue(json.loads((ROOT / "vercel.json").read_text())["cleanUrls"])  # /proof is the prerendered proof.html
         fallback = re.compile("^" + rules[-1]["source"] + "$")
         for page in ("/", "/proof", "/security", "/agent", "/carbon", "/note", "/method", "/no-such-page"):
