@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { screen, within } from "@testing-library/react";
 import { GLOSSARY } from "@/content/glossary";
@@ -7,12 +7,13 @@ import { figuresWithoutScope, renderRoute } from "@/test/render";
 import { snapshot } from "@/test/snapshot";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const ORIGINAL = resolve(__dirname, "..", "..", "..", "web", "index.html");
+/** The original page's "What this does not claim" block, byte for byte (the original page itself was removed). */
+const ORIGINAL = resolve(__dirname, "..", "test", "fixtures", "what-this-does-not-claim.html");
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe("Method", () => {
-  it.skipIf(!existsSync(ORIGINAL))("keeps 'What this does not claim' word for word from the original page", () => {
+  it("keeps 'What this does not claim' word for word from the original page", () => {
     const html = readFileSync(ORIGINAL, "utf-8");
     const block = html.slice(html.indexOf('id="limits-h"'), html.indexOf("</ul>", html.indexOf('id="limits-h"')));
     const original = [...block.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]!.trim());

@@ -1,6 +1,7 @@
 /**
- * "What this does not claim", word for word from the original page (web/index.html). Do not edit: a test compares
- * it with the original, and checks its test period against the carbon data.
+ * "What this does not claim", word for word from the original page (kept as src/test/fixtures/
+ * what-this-does-not-claim.html). Do not edit: a test compares it with that fixture, and checks its test period
+ * against the carbon data.
  */
 export const LIMITS = [
   "Issuers and registries in the demo replay Energinet's published data; they are not accredited bodies.",
