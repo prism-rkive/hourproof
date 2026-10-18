@@ -39,6 +39,8 @@ async function newSite(page: Page) {
   for (const path of PAGES) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.locator("html[data-hydrated]")).toBeAttached(); // interactive (hydrated), not just painted
+
     for (const b of await page.getByRole("button", { name: /Expand all/ }).all()) await b.click();
     const tables = page.getByRole("button", { name: "View as table" }); // each turns into "Hide table" when opened
     while (await tables.count()) await tables.first().click();

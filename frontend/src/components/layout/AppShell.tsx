@@ -35,6 +35,11 @@ export function AppShell() {
   const main = useRef<HTMLElement>(null);
   const first = useRef(true);
   useEffect(() => {
+    // The page is interactive from here on: a prerendered page shows its controls before React attaches, and a
+    // click before this point is lost. Tests wait for this marker before they interact.
+    document.documentElement.dataset.hydrated = "true";
+  }, []);
+  useEffect(() => {
     // After client-side navigation, move focus to the new page so screen readers announce it (not on first load).
     if (first.current) {
       first.current = false;

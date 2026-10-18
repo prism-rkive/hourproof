@@ -28,6 +28,7 @@ for (const name of PAGES) {
         await page.goto(name === "overview" ? "/" : name === "404" ? "/no-such-page" : `/${name}`);
         await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
         await expect(page.getByText(/Last run .* passed/).first()).toBeAttached();
+        await expect(page.locator("html[data-hydrated]")).toBeAttached(); // charts render only once hydrated
         await page.evaluate(() => document.fonts.ready);
         await scrollThrough(page); // charts load when near the viewport
         await page.waitForTimeout(300);

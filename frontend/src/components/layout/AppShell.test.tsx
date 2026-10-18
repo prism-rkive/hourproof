@@ -59,6 +59,13 @@ describe("app shell", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Page not found" })).toBeInTheDocument();
   });
 
+  it("marks the document as interactive once the shell has rendered", async () => {
+    delete document.documentElement.dataset.hydrated;
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    expect(document.documentElement.dataset.hydrated).toBe("true");
+  });
+
   it("has a skip link to the main content", async () => {
     renderAt("/");
     await screen.findByRole("heading", { level: 1 });

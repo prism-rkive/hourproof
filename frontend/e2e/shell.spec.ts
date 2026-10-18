@@ -10,6 +10,7 @@ const THEMES = ["dark", "light"] as const;
 async function ready(page: Page) {
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByText(/Last run .* passed/).first()).toBeAttached();
+  await expect(page.locator("html[data-hydrated]")).toBeAttached(); // interactive (hydrated), not just painted
   await page.evaluate(() => document.fonts.ready);
 }
 
