@@ -36,5 +36,7 @@ from the same API.
 - Tests:
   - Python: the export fields, the log, the build output and the local server's page routing.
   - Vitest: every displayed figure against the snapshot, and a period label on every figure.
-  - Playwright: every page in both themes at 375 and 1440 px, no console or hydration errors, and parity with
-    `web/` (every figure and all 80 transaction links).
+  - Playwright: every page in both themes at 375 and 1440 px, and no console or hydration errors.
+- Before `web/` was removed, a parity test compared it with the new site on the same snapshot, locally and against
+  production: every figure the old page showed, and all 80 transaction links, are on the new site. The original
+  "What this does not claim" block is kept as a test fixture.

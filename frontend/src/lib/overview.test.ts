@@ -1,6 +1,6 @@
 /**
  * Every figure the Overview shows, checked against the committed snapshot with independent arithmetic (the rules of
- * the original web/app.js), so a presentation change can never change a number.
+ * the original web/app.js, now in git history), so a presentation change can never change a number.
  */
 import { snapshot } from "@/test/snapshot";
 import { Overview, Week, type WeekData } from "./schemas";

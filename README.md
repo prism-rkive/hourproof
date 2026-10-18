@@ -204,9 +204,10 @@ original coverage-only scenario.
 Seven pages (Overview, Proof run, Security, Agent, Carbon, Note, Method), built with Vite, React, TypeScript, React
 Router, Tailwind and Recharts. Every figure is read from the API data, never typed in; every page explains itself in
 plain terms and underlines jargon with a definition. Locally, `make serve` serves it with the live API and the run
-buttons. `make test-web` runs its checks: format, types, lint, unit tests against the committed snapshot, and browser
-tests (every page in both themes at 375 and 1440 px, no console or hydration errors, and parity with the original
-dashboard: every figure and every one of the 80 transaction links).
+buttons. `make test-web` runs its checks: format, types, lint, unit tests against the committed snapshot (every
+displayed figure, its period label, all 80 transaction links), and browser tests (every page and the 404 page in
+both themes at 375 and 1440 px, no console or hydration errors, no requests to other sites). See
+`frontend/e2e/README.md`.
 
 **Setup (once): Node 22.** `make serve` serves the built dashboard (`frontend/dist`) and stops with a clear
 message if it is missing, so build it first with `make web`. That needs Node 22.14 or newer 22.x. npm 11.20 is
@@ -255,7 +256,6 @@ circuits/    Noir workspace: hp_lib (shared commitment), coverage, emissions, lo
 hourproof/   Python: eds, dataset, agent, carbon, zk, pq, chain (cast), demo, live, verify, site, server, CLI
 frontend/    Dashboard (Vite + React + TypeScript): src/pages, src/components, src/lib (schemas, selectors, formatting),
              prerender.mjs, e2e/ (Playwright)
-web/         The original dashboard, kept until the new one replaces it
 tests/       Python unittest suite
 docs/        SECURITY.md (threat model), ARCHITECTURE.md, AGENT_RESULTS.md, CARBON_RESULTS.md, BASE_SEPOLIA.md
 evidence/    The verified Base Sepolia run (state, plans, submitted proofs, verification logs) and the two failed attempts

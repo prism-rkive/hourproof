@@ -116,7 +116,7 @@ export type RunStatusView = {
   pulse?: boolean;
 };
 
-/** Same rules as the original dashboard header (web/app.js): running, else last run passed / failed, else none. */
+/** Same rules as the original dashboard header (web/app.js, in git history): running, else last run passed / failed, else none. */
 export function runStatus(o: RunInfo): RunStatusView {
   const demo = o.demo;
   if (o.running) return { tone: "warning", short: "Run in progress", full: "A run is in progress", pulse: true };
@@ -223,7 +223,7 @@ export type WeekMode = "naive" | "agent";
 
 export type HourCell = { i: number; hour: string; load: number; cert: number; share: number; label: string };
 
-/** The 7 x 24 heatmap for one strategy: same arithmetic as web/app.js renderWeek. */
+/** The 7 x 24 heatmap for one strategy: same arithmetic as the original web/app.js renderWeek (in git history). */
 export function weekView(week: WeekData, mode: WeekMode) {
   const load = mode === "agent" ? week.private_agent_load_mwh : week.private_naive_load_mwh;
   const cert = week.base_mwh.map((b, i) => b + (mode === "agent" ? (week.topup_mwh[i] ?? 0) : 0));

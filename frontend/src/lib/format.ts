@@ -1,6 +1,6 @@
 /**
  * Presentation-only formatting. Never changes a value, only how it is written. The rules match the original
- * dashboard (web/app.js) so every figure reads the same: percentages with one decimal, basis points as a percentage
+ * dashboard (web/app.js, now in git history) so every figure reads the same: percentages with one decimal, basis points as a percentage
  * with two, tonnes with at most one decimal, MWh and gas as rounded integers with thousands separators.
  */
 
