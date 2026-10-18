@@ -53,3 +53,7 @@ data/keys/
 hp_ai/cache/*
 !hp_ai/cache/Elspotprices_*.json
 !hp_ai/cache/DayAheadPrices_*.json
+
+# --- Devpost submission material (local only) -------------------------------------------------------------------
+submission/
+video/
