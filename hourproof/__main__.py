@@ -211,6 +211,10 @@ def cmd_demo(a) -> None:
 
 def cmd_serve(a) -> None:
     import uvicorn
+    from .server import FRONTEND_DIST
+    if not (FRONTEND_DIST / "spa.html").exists():
+        print("The dashboard is not built: run `make web` first (needs Node 22; see 'The dashboard' in the README).\n"
+              "The API still starts, and the page explains this until the build exists.")
     print(f"HourProof dashboard: http://127.0.0.1:{a.port}")
     uvicorn.run("hourproof.server:app", host="127.0.0.1", port=a.port, log_level="warning")
 

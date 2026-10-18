@@ -1,5 +1,5 @@
 """The local dashboard server serves the React build like the host does: deep links get the app, files are files,
-unknown API paths are JSON 404s, and the live API is unchanged."""
+unknown API paths are JSON 404s, and the live API is unchanged. Without a build, every page says to run `make web`."""
 import asyncio
 import json
 import tempfile
@@ -89,12 +89,13 @@ class SpaServingTests(unittest.TestCase):
         self.assertIn("running", r.json())
         self.assertEqual(self.client.get("/api/demo/log").json().keys(), {"running", "log"})
 
-    def test_without_a_build_the_original_page_is_served(self):
+    def test_without_a_build_every_page_says_to_run_make_web_and_the_api_still_works(self):
         with mock.patch.object(server, "FRONTEND_DIST", Path(self.tmp.name) / "missing"):
-            r = self.client.get("/")
-            self.assertEqual(r.status_code, 200)
-            self.assertIn("HourProof", r.text)
-
+            for path in ("/", "/proof", "/no-such-page"):
+                r = self.client.get(path)
+                self.assertEqual(r.status_code, 503, path)
+                self.assertIn("make web", r.text, path)
+            self.assertEqual(self.client.get("/api/overview").status_code, 200)
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,11 +11,10 @@ from pathlib import Path
 import pandas as pd
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import FileResponse, JSONResponse
-from starlette.routing import Mount, Route
-from starlette.staticfiles import StaticFiles
+from starlette.responses import FileResponse, HTMLResponse, JSONResponse
+from starlette.routing import Route
 
-from .config import BACKTEST_JSON, CARBON_BACKTEST_JSON, DATA, DATASET_CSV, DATASET_META, DEMO_STATE, LIVE_JSON, ROOT, WEB
+from .config import BACKTEST_JSON, CARBON_BACKTEST_JSON, DATA, DATASET_CSV, DATASET_META, DEMO_STATE, LIVE_JSON, ROOT
 from . import zk
 
 _run_lock = threading.Lock()
@@ -27,7 +26,14 @@ def _read(p: Path):
     return json.loads(p.read_text()) if p.exists() else None
 
 
-FRONTEND_DIST = ROOT / "frontend" / "dist"  # the React build (cd frontend && npm run build); web/ until it exists
+FRONTEND_DIST = ROOT / "frontend" / "dist"  # the dashboard build: make web (Node 22)
+
+NOT_BUILT = """<!doctype html><html lang="en"><meta charset="utf-8"><title>HourProof: dashboard not built</title>
+<body style="font:16px/1.5 system-ui,sans-serif;max-width:40rem;margin:4rem auto;padding:0 1rem">
+<h1>The dashboard is not built yet</h1>
+<p>Run <code>make web</code> (needs Node 22; it installs with npm 11.20 through npx and builds
+<code>frontend/dist</code>), then reload this page. See "The dashboard" in the README.</p>
+<p>The API already works: <a href="/api/overview">/api/overview</a>.</p>"""
 
 
 def _shell() -> Path | None:
@@ -39,9 +45,13 @@ def _shell() -> Path | None:
     return None
 
 
+def _not_built() -> HTMLResponse:
+    return HTMLResponse(NOT_BUILT, status_code=503)
+
+
 async def index(_: Request):
     shell = _shell()
-    return FileResponse(shell if shell else WEB / "index.html")
+    return FileResponse(shell) if shell else _not_built()
 
 
 async def spa(request: Request):
@@ -52,7 +62,7 @@ async def spa(request: Request):
         return JSONResponse({"error": "not found"}, status_code=404)
     shell = _shell()
     if not shell:
-        return JSONResponse({"error": "not found"}, status_code=404)
+        return _not_built()
     f = (FRONTEND_DIST / path).resolve()
     if f.is_file() and f.suffix != ".html" and FRONTEND_DIST.resolve() in f.parents:
         return FileResponse(f)
@@ -209,6 +219,5 @@ app = Starlette(routes=[
     Route("/api/carbon", carbon_view),
     Route("/api/demo/run", run_demo, methods=["POST"]),
     Route("/api/demo/log", run_log),
-    Mount("/static", StaticFiles(directory=WEB), name="static"),
     Route("/{path:path}", spa),
 ])

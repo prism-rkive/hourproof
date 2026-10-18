@@ -8,7 +8,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CONTRACTS = ROOT / "contracts"
 CIRCUITS = ROOT / "circuits"
-WEB = ROOT / "web"
 DATA = Path(os.environ.get("HOURPROOF_DATA", ROOT / "data"))
 CACHE = DATA / "eds_cache"
 KEYS = DATA / "keys"

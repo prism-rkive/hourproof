@@ -76,7 +76,8 @@ verify-evidence: ## re-check the committed evidence bundle on Base Sepolia (read
 	$(PY) -m hourproof verify --state evidence/base-sepolia-20261017T141639Z/state.json
 	python3 scripts/check_public_run.py evidence/base-sepolia-20261017T141639Z/state.json
 
-serve:           ## dashboard on http://127.0.0.1:8000
+serve:           ## dashboard on http://127.0.0.1:8000 (build it first: make web)
+	@test -f frontend/dist/spa.html || { echo "The dashboard is not built: run 'make web' first (needs Node 22; see 'The dashboard' in the README)." >&2; exit 1; }
 	$(PY) -m hourproof serve
 
 e2e:             ## everything, in order, with a checklist

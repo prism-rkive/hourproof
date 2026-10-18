@@ -208,6 +208,19 @@ buttons. `make test-web` runs its checks: format, types, lint, unit tests agains
 tests (every page in both themes at 375 and 1440 px, no console or hydration errors, and parity with the original
 dashboard: every figure and every one of the 80 transaction links).
 
+**Setup (once): Node 22.** `make serve` serves the built dashboard (`frontend/dist`) and stops with a clear
+message if it is missing, so build it first with `make web`. That needs Node 22.14 or newer 22.x. npm 11.20 is
+fetched by `npx`, so no global npm upgrade is needed. Install Node with the official installer
+(https://nodejs.org) or a version manager, e.g. `nvm install 22`. In WSL without Node you can also build on the
+Windows side: `frontend/dist` is plain static files, so `make serve` in WSL serves a build made on Windows.
+
+```bash
+make web                                  # = cd frontend && npx --yes npm@11.20.0 ci && npm run build
+make serve                                # http://127.0.0.1:8000: the dashboard on the live API, with the run buttons
+```
+
+For development:
+
 ```bash
 cd frontend && npx --yes npm@11.20.0 ci   # pinned: Node 22, npm 11.20 (engine-strict)
 npm run dev                               # http://localhost:5173, data from deploy/snapshot (HP_API=http://127.0.0.1:8000 for the live API)
