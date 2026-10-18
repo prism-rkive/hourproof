@@ -29,7 +29,10 @@ export function MobileMenu() {
           Pages, run status and links
         </SheetDescription>
         <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4">
-          <RunStatusPill variant="menu" />
+          {/* from md up the top bar shows the run status: one status in the page at a time */}
+          <div className="md:hidden">
+            <RunStatusPill variant="menu" />
+          </div>
           <nav aria-label="Main">
             <ul className="flex flex-col gap-1">
               {PAGES.map((p) => (

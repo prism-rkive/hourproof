@@ -12,7 +12,7 @@ import { ScopeTag } from "@/components/ScopeTag";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Term } from "@/components/Term";
 import { getCarbon, getOverview } from "@/lib/api";
-import { bps, dayLabel, int, networkName, pct, testScope, weekScope } from "@/lib/format";
+import { bps, dateLabel, int, networkName, pct, testScope, weekScope } from "@/lib/format";
 import type { Carbon, CarbonData } from "@/lib/schemas";
 import { runInfo, type RunInfo } from "@/lib/selectors";
 
@@ -212,7 +212,7 @@ function TheWeek({ c }: { c: CarbonData }) {
                 <option value="all">Whole week</option>
                 {days.map((d) => (
                   <option key={d} value={d}>
-                    {dayLabel(w.hours[d * 24]!)}
+                    {dateLabel(w.hours[d * 24]!)}
                   </option>
                 ))}
               </select>
@@ -241,7 +241,7 @@ function TheWeek({ c }: { c: CarbonData }) {
             caption="Hourly intensity, forecast and planned shift"
             head={["Hour (UTC)", "Actual, g/kWh", "Forecast, g/kWh", "Planned shift, MWh"]}
             rows={cells.map((x) => [
-              `${dayLabel(x.hour)} ${x.hour.slice(11, 16)}`,
+              `${dateLabel(x.hour)} ${x.hour.slice(11, 16)}`,
               Math.round(x.v),
               Math.round(x.forecast),
               x.shift.toFixed(1),
@@ -282,7 +282,7 @@ function TheWeek({ c }: { c: CarbonData }) {
           readout={(x) => (
             <>
               <span className="font-medium text-foreground">
-                {dayLabel(x.hour)}, {x.hour.slice(11, 16)} UTC
+                {dateLabel(x.hour)}, {x.hour.slice(11, 16)} UTC
               </span>
               {" · "}
               {Math.round(x.v)} g/kWh actual, {Math.round(x.forecast)} forecast

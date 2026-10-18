@@ -1,4 +1,5 @@
-import { Equal, Plus } from "lucide-react";
+import * as Popover from "@radix-ui/react-popover";
+import { Info } from "lucide-react";
 import type { ReactNode } from "react";
 import { useLoaderData } from "react-router";
 import { DataTable } from "@/components/ChartCard";
@@ -49,26 +50,26 @@ function Row({ label, children, note }: { label: ReactNode; children: ReactNode;
   );
 }
 
-function CouponMath({ base, stepUp, coupon, met }: { base: number; stepUp: number; coupon: number; met: boolean }) {
-  const box = (label: string, value: string, active: boolean) => (
-    <div
-      className={cn(
-        "flex items-center justify-between rounded-lg border px-4 py-3",
-        active ? "border-brand/40 bg-brand-subtle" : "border-border bg-muted",
-      )}
-    >
-      <p className="text-13 text-muted-foreground">{label}</p>
-      <p className="tabular text-xl font-semibold">{value}</p>
-    </div>
-  );
+/** The exact source of a figure, one tap or click away (a popover, so it also works on touch screens). */
+function SourceDetails({ children }: { children: ReactNode }) {
   return (
-    <div className="flex flex-col items-stretch gap-2">
-      {box("Base coupon", bps(base), true)}
-      <Plus className="mx-auto size-4 shrink-0 text-subtle-foreground" aria-label="plus" />
-      {box(met ? "Step-up (not applied: KPI met)" : "Step-up (applied: KPI missed)", bps(stepUp), !met)}
-      <Equal className="mx-auto size-4 shrink-0 text-subtle-foreground" aria-label="equals" />
-      {box("Coupon", bps(coupon), true)}
-    </div>
+    <Popover.Root>
+      <Popover.Trigger className="ml-1 inline-flex items-center gap-1 rounded-sm text-subtle-foreground underline decoration-dotted underline-offset-2 hover:text-foreground">
+        <Info className="size-3" aria-hidden />
+        How was this read?
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          side="top"
+          sideOffset={6}
+          collisionPadding={16}
+          className="z-50 w-80 max-w-[calc(100vw-2rem)] animate-in rounded-lg border border-border bg-popover p-3.5 text-13 leading-relaxed break-words text-popover-foreground shadow-lg"
+        >
+          {children}
+          <Popover.Arrow className="fill-popover" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
 
@@ -82,6 +83,13 @@ export function Component() {
   const source = noteStep?.metrics.notes_subscribed_source;
   const basis = [...(terms.target_basis ?? [])].sort((a, b) => a.week_utc.localeCompare(b.week_utc));
   const residual = terms.kpi === "RESIDUAL_EMISSIONS";
+  const runMonth = demo?.started_utc
+    ? new Date(demo.started_utc).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" })
+    : null;
+  const replayLine =
+    runMonth && week.startsWith("Week of")
+      ? `The run replayed the ${week.replace("Week", "week")} (Energinet's published data) on Base Sepolia in ${runMonth}, so the deadline is a date on the chain's clock.`
+      : null;
 
   return (
     <Page className="space-y-12 sm:space-y-16">
@@ -164,7 +172,17 @@ export function Component() {
                 {terms.step_up_bps != null && <Row label="Step-up if the KPI is missed">+{bps(terms.step_up_bps)}</Row>}
                 <Row label="Coupon">{bps(f.couponBps)}</Row>
                 {f.notes != null && (
-                  <Row label="Notes subscribed" note={typeof source === "string" ? `Source: ${source}.` : undefined}>
+                  <Row
+                    label="Notes subscribed"
+                    note={
+                      typeof source === "string" ? (
+                        <>
+                          Read from the note contract on Base Sepolia when this snapshot was made.
+                          <SourceDetails>{source}.</SourceDetails>
+                        </>
+                      ) : undefined
+                    }
+                  >
                     {int(f.notes)}
                   </Row>
                 )}
@@ -183,7 +201,12 @@ export function Component() {
                 {terms.deadline_unix != null && (
                   <Row
                     label="Deadline"
-                    note="Anyone can settle the note: at once if a proof meets the KPI, otherwise after the deadline."
+                    note={
+                      <>
+                        Anyone can settle the note: at once if a proof meets the KPI, otherwise after the deadline.
+                        {replayLine && <span className="mt-1 block">{replayLine}</span>}
+                      </>
+                    }
                   >
                     {unixUtc(terms.deadline_unix)} (chain time)
                   </Row>
@@ -191,27 +214,34 @@ export function Component() {
               </dl>
             </div>
             <div className="space-y-6">
-              {terms.base_coupon_bps != null && terms.step_up_bps != null && (
-                <div className="rounded-xl border border-border bg-card p-5 shadow-xs">
-                  <h3 className="text-sm font-semibold">How the coupon is set</h3>
-                  <p className="mt-1 mb-4 text-13 text-muted-foreground">
-                    Investors receive the base coupon if the KPI is proven; otherwise it steps up.
+              <div className="rounded-xl border border-border bg-card p-5 shadow-xs">
+                <h3 className="text-sm font-semibold">How the coupon is set</h3>
+                <ol className="mt-3 space-y-3 text-13 leading-relaxed text-muted-foreground">
+                  {[
+                    "Before the week, a fixed rule sets the emissions target (see below), so nobody can choose it afterwards.",
+                    "By the deadline, the buyer may submit a zero-knowledge proof that its residual emissions are at most some cap.",
+                    "Anyone can then settle the note. If a proven cap meets the target, investors receive the base coupon; if not, the coupon automatically steps up by a fixed amount.",
+                  ].map((t, i) => (
+                    <li key={i} className="flex gap-3">
+                      <span
+                        className="flex size-5 shrink-0 items-center justify-center rounded-full border border-border-strong font-mono text-[11px]"
+                        aria-hidden
+                      >
+                        {i + 1}
+                      </span>
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ol>
+                {f.kpiMet !== undefined && (
+                  <p className="mt-4 border-t border-border pt-3 text-13 text-muted-foreground">
+                    {f.kpiMet
+                      ? "In this run a proof met the target, so the base coupon applied."
+                      : "In this run no proof met the target, so the step-up applied."}{" "}
+                    The figures are in the term sheet.
                   </p>
-                  <CouponMath
-                    base={terms.base_coupon_bps}
-                    stepUp={f.kpiMet ? 0 : terms.step_up_bps}
-                    coupon={f.couponBps}
-                    met={!!f.kpiMet}
-                  />
-                  {f.couponPaid != null && f.notes != null && (
-                    <p className="mt-4 text-13 text-muted-foreground">
-                      Paid to the investor:{" "}
-                      <span className="tabular font-medium text-foreground">{int(f.couponPaid)} tUSD</span> on{" "}
-                      {int(f.notes)} notes.
-                    </p>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </section>
 
@@ -239,6 +269,12 @@ export function Component() {
                 ]}
                 className="max-w-xl"
               />
+              <p className="max-w-xl text-sm text-pretty text-muted-foreground">
+                Residual emissions swing widely between windy and calm weeks, because the wind decides how much of the
+                load is matched hour by hour: these {basis.length} weeks range from{" "}
+                {tonnes(Math.min(...basis.map((b) => b.residual_kg)))} to{" "}
+                {tonnes(Math.max(...basis.map((b) => b.residual_kg)))}.
+              </p>
             </section>
           )}
 

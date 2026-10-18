@@ -50,8 +50,9 @@ describe("app shell", () => {
 
   it("shows the last run status from the API data", async () => {
     renderAt("/");
-    const status = await screen.findByText(`Last run ${overview.demo.run_id} on Base Sepolia: passed`);
-    expect(status).toHaveAttribute("role", "status");
+    await screen.findByRole("heading", { level: 1 });
+    const statuses = (await screen.findAllByRole("status")).filter((s) => s.textContent?.startsWith("Last run"));
+    expect(statuses.map((s) => s.textContent)).toEqual([`Last run ${overview.demo.run_id} on Base Sepolia: passed`]);
   });
 
   it("shows a 404 page for unknown paths", async () => {

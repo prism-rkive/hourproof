@@ -62,26 +62,33 @@ export function dayLabel(hour: string, short = false): string {
   );
 }
 
-/** "Week of 10–16 Nov" (or "Week of 28 Nov – 4 Dec") for the 7 days starting at a dataset hour string, UTC. */
-export function weekScope(startHour: string): string {
-  const start = utcHour(startHour);
-  const end = new Date(start.getTime() + 6 * 86_400_000);
+/** "10–16 Nov 2025", "28 Nov – 4 Dec 2025" or "29 Dec 2025 – 4 Jan 2026": a date range, always with its year. */
+function dateRange(start: Date, end: Date): string {
   const d = (x: Date) => x.getUTCDate();
   const m = (x: Date) => x.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
-  return m(start) === m(end)
-    ? `Week of ${d(start)}–${d(end)} ${m(end)}`
-    : `Week of ${d(start)} ${m(start)} – ${d(end)} ${m(end)}`;
+  const y = (x: Date) => x.getUTCFullYear();
+  if (y(start) !== y(end)) return `${d(start)} ${m(start)} ${y(start)} – ${d(end)} ${m(end)} ${y(end)}`;
+  if (m(start) !== m(end)) return `${d(start)} ${m(start)} – ${d(end)} ${m(end)} ${y(end)}`;
+  return `${d(start)}–${d(end)} ${m(end)} ${y(end)}`;
 }
 
-/** "Weeks of 6 Oct – 2 Nov" for whole weeks starting at the first and last given week starts (UTC dates). */
+/** "Week of 10–16 Nov 2025" for the 7 days starting at a dataset hour string, UTC. */
+export function weekScope(startHour: string): string {
+  const start = utcHour(startHour);
+  return `Week of ${dateRange(start, new Date(start.getTime() + 6 * 86_400_000))}`;
+}
+
+/** "Weeks of 6 Oct – 2 Nov 2025" for whole weeks starting at the first and last given week starts (UTC dates). */
 export function weeksScope(firstWeek: string, lastWeek: string): string {
   const day = (iso: string, plus = 0) =>
-    new Date(new Date(iso.slice(0, 10) + "T00:00:00Z").getTime() + plus * 86_400_000).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      timeZone: "UTC",
-    });
-  return `Weeks of ${day(firstWeek)} – ${day(lastWeek, 6)}`;
+    new Date(new Date(iso.slice(0, 10) + "T00:00:00Z").getTime() + plus * 86_400_000);
+  return `Weeks of ${dateRange(day(firstWeek), day(lastWeek, 6))}`;
+}
+
+/** "Mon 10 Nov 2025" (UTC): a date shown on its own always carries its year. */
+export function dateLabel(hour: string): string {
+  const d = utcHour(hour); // built from parts: with a year, en-GB would add a comma after the weekday
+  return `${dayLabel(hour)} ${d.getUTCFullYear()}`;
 }
 
 /** "17 Oct 2026, 14:29 UTC" from Unix seconds. */

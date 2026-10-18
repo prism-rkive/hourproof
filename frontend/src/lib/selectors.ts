@@ -113,6 +113,7 @@ export type RunStatusView = {
   full: string; // complete sentence (screen readers, tooltip, mobile menu)
   runId?: string;
   network?: string;
+  outcome?: string; // "passed" / "failed": the last word of the full sentence
   pulse?: boolean;
 };
 
@@ -127,6 +128,7 @@ export function runStatus(o: RunInfo): RunStatusView {
       full: `Last run ${demo.run_id} on ${networkName(demo.network)}: passed`,
       runId: demo.run_id,
       network: networkName(demo.network),
+      outcome: "passed",
     };
   if (demo?.status === "failed")
     return {
@@ -135,6 +137,7 @@ export function runStatus(o: RunInfo): RunStatusView {
       full: `Last run ${demo.run_id} on ${networkName(demo.network)}: failed`,
       runId: demo.run_id,
       network: networkName(demo.network),
+      outcome: "failed",
     };
   if (demo) return { tone: "neutral", short: `Run ${demo.status}`, full: `Run ${demo.run_id}: ${demo.status}` };
   return { tone: "neutral", short: "No run yet", full: "No run has been recorded yet" };

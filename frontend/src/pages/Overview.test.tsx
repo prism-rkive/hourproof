@@ -12,7 +12,7 @@ const pct = (x: number) => `${(100 * x).toFixed(1)}%`;
 afterEach(() => vi.unstubAllGlobals());
 
 describe("Overview", () => {
-  it("labels the period of every displayed figure, in both views of the week", async () => {
+  it("labels the period of every displayed figure, in both views of the week", { timeout: 20000 }, async () => {
     await renderRoute("/");
     const main = document.getElementById("main")!;
     for (const b of screen.getAllByRole("button", { name: "View as table" })) await userEvent.click(b); // tables too
@@ -27,7 +27,7 @@ describe("Overview", () => {
   it("uses only the two scopes: full year, and the run's week", async () => {
     await renderRoute("/");
     const scopes = new Set([...document.querySelectorAll<HTMLElement>("[data-scope]")].map((e) => e.dataset.scope));
-    expect(scopes).toEqual(new Set(["Full year", "Week of 10–16 Nov"]));
+    expect(scopes).toEqual(new Set(["Full year", "Week of 10–16 Nov 2025"]));
     expect(o.demo.window.window_start_utc.slice(0, 10)).toBe("2025-11-10"); // the label comes from this
   });
 

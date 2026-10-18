@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { WeekHeatmap } from "@/components/WeekHeatmap";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { getOverview, getWeek } from "@/lib/api";
-import { bps, dayLabel, FULL_YEAR, int, networkName, pct, pctShort, tonnes, weekScope } from "@/lib/format";
+import { bps, dateLabel, FULL_YEAR, int, networkName, pct, pctShort, tonnes, weekScope } from "@/lib/format";
 import type { Overview, Week, WeekData } from "@/lib/schemas";
 import { hero, overviewForHome, runFigures, runWeekScope, weekView, type WeekMode } from "@/lib/selectors";
 import { pageMeta } from "@/routes";
@@ -273,7 +273,7 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
   const runBps = mode === "agent" ? f.truePrivateBps : f.naiveBps; // the run's figure leads; the heatmap's is in the caption
   const days = Array.from({ length: v.cells.length / 24 }, (_, d) => v.cells.slice(d * 24, d * 24 + 24));
   const explain = MODES.find((m) => m.value === mode)!.explain;
-  const hourlyRows = v.cells.map((c) => [`${dayLabel(c.hour)} ${c.hour.slice(11, 16)}`, int(c.cert), int(c.load)]);
+  const hourlyRows = v.cells.map((c) => [`${dateLabel(c.hour)} ${c.hour.slice(11, 16)}`, int(c.cert), int(c.load)]);
   return (
     <section aria-labelledby="week-h" className="space-y-6">
       <SectionHeading
@@ -313,7 +313,7 @@ function TheWeek({ o, week }: { o: Overview; week: WeekData }) {
           <DataTable
             caption="Share of each hour's use covered by certificates"
             head={["Day", ...Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, "0")}:00`)]}
-            rows={days.map((row) => [dayLabel(row[0]!.hour), ...row.map((c) => pct(c.share, 0))])}
+            rows={days.map((row) => [dateLabel(row[0]!.hour), ...row.map((c) => pct(c.share, 0))])}
           />
         }
       >

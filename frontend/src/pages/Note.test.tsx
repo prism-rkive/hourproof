@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
 import { figuresWithoutScope, renderRoute } from "@/test/render";
 import { snapshot } from "@/test/snapshot";
@@ -22,7 +23,9 @@ describe("Note", () => {
     expect(main).toHaveTextContent(bps(m.coupon_bps));
     expect(main).toHaveTextContent(`${m.coupon_paid_tusd} tUSD`);
     expect(main).toHaveTextContent(m.notes_subscribed.toLocaleString("en-GB")); // from the snapshot, not the chain
-    expect(main).toHaveTextContent(m.notes_subscribed_source);
+    expect(main).not.toHaveTextContent("totalSupply()"); // the contract call is one click away, not in the line
+    await userEvent.click(screen.getByRole("button", { name: /How was this read/ }));
+    expect(await screen.findByRole("dialog")).toHaveTextContent(m.notes_subscribed_source);
     expect(m.kpi_met).toBe(false);
     expect(
       screen.getByRole("heading", { level: 2, name: `Target missed: the coupon stepped up to ${bps(m.coupon_bps)}.` }),

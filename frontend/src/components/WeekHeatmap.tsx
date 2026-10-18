@@ -1,4 +1,4 @@
-import { dayLabel, int, pct } from "@/lib/format";
+import { dateLabel, int, pct } from "@/lib/format";
 import type { HourCell } from "@/lib/selectors";
 import { HourGrid } from "./HourGrid";
 
@@ -19,7 +19,7 @@ export function WeekHeatmap({ cells, label }: { cells: HourCell[]; label: string
       readout={(c) => (
         <>
           <span className="font-medium text-foreground">
-            {dayLabel(c.hour)}, {c.hour.slice(11, 16)} UTC
+            {dateLabel(c.hour)}, {c.hour.slice(11, 16)} UTC
           </span>
           {" · "}
           {int(Math.min(c.cert, c.load))} of {int(c.load)} MWh covered ({pct(c.share, 0)})

@@ -5,7 +5,7 @@
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useChartColors } from "@/hooks/useChartColors";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { dayLabel, int, weekday } from "@/lib/format";
+import { dateLabel, dayLabel, int, weekday } from "@/lib/format";
 
 export type HourlyChartProps = {
   hours: string[];
@@ -50,7 +50,7 @@ export default function HourlyChart({ hours, bars, barLabel, line, lineLabel, he
             return (
               <div className="rounded-lg border border-border bg-popover px-3 py-2 text-xs shadow-md">
                 <p className="font-medium text-foreground">
-                  {dayLabel(p.hour)}, {String(p.hour).slice(11, 16)} UTC
+                  {dateLabel(p.hour)}, {String(p.hour).slice(11, 16)} UTC
                 </p>
                 <p className="tabular mt-1 text-muted-foreground">
                   {barLabel}: <span className="text-foreground">{int(p.bar)} MWh</span>

@@ -35,24 +35,25 @@ function Pill({ overview, variant }: { overview: RunInfo; variant: "bar" | "menu
         {s.pulse && <span className={cn("absolute inset-0 animate-ping rounded-full opacity-60", DOT[s.tone])} />}
         <span className={cn("relative size-2 rounded-full", DOT[s.tone])} />
       </span>
-      <span role="status" aria-live="polite" className="sr-only">
-        {s.full}
-      </span>
-      {variant === "menu" ? (
-        <span aria-hidden className="flex min-w-0 flex-col">
-          <span className="text-foreground">{s.short}</span>
-          {s.runId && (
-            <span className="truncate font-mono text-xs text-subtle-foreground">
-              {s.runId} · {s.network}
-            </span>
-          )}
+      {/* One sentence, read once: "Last run <id> on <network>: passed". In the top bar the ID shows from xl up and the
+          network is only for screen readers; the hidden parts are visually hidden, never a second copy. */}
+      {!s.runId ? (
+        <span role="status" aria-live="polite" className="truncate">
+          {s.short}
+        </span>
+      ) : variant === "menu" ? (
+        <span role="status" aria-live="polite" className="min-w-0 text-pretty text-foreground">
+          Last run <span className="font-mono text-xs break-all text-subtle-foreground">{s.runId}</span> on {s.network}:{" "}
+          {s.outcome}
         </span>
       ) : (
-        <span aria-hidden className="truncate">
-          {s.short}
-          {s.runId && (
-            <span className="ml-1.5 hidden font-mono text-xs text-subtle-foreground xl:inline">{s.runId}</span>
-          )}
+        <span role="status" aria-live="polite" className="truncate">
+          Last run
+          <span className="sr-only xl:not-sr-only">
+            {" "}
+            <span className="font-mono text-xs text-subtle-foreground">{s.runId}</span>
+          </span>
+          <span className="sr-only"> on {s.network}:</span> {s.outcome}
         </span>
       )}
     </Link>

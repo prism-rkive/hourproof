@@ -1,5 +1,5 @@
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { dayLabel } from "@/lib/format";
+import { dateLabel, dayLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const HOURS = 24;
@@ -56,7 +56,7 @@ export function HourGrid<C extends GridCell>({
     }
   };
   const rowCls =
-    "grid grid-cols-[2.75rem_repeat(24,minmax(0,1fr))] gap-[2px] sm:grid-cols-[5.25rem_repeat(24,minmax(0,1fr))] sm:gap-[3px]";
+    "grid grid-cols-[2.75rem_repeat(24,minmax(0,1fr))] gap-[2px] sm:grid-cols-[6.75rem_repeat(24,minmax(0,1fr))] sm:gap-[3px]";
 
   return (
     <div>
@@ -80,7 +80,7 @@ export function HourGrid<C extends GridCell>({
           <div role="row" key={d} className={cn(rowCls, "items-center")}>
             <span role="rowheader" className="truncate pr-1 text-[11px] text-muted-foreground sm:text-xs">
               <span className="sm:hidden">{dayLabel(row[0]!.hour, true)}</span>
-              <span className="hidden sm:inline">{dayLabel(row[0]!.hour)}</span>
+              <span className="hidden sm:inline">{dateLabel(row[0]!.hour)}</span>
             </span>
             {row.map((c) => (
               <div
