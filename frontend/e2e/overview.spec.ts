@@ -3,6 +3,17 @@ import { expect, test, type Page } from "@playwright/test";
 const SHOTS = "e2e/screenshots";
 const PAGES = ["/", "/proof", "/security", "/agent", "/carbon", "/note", "/method"];
 
+/** Scroll through the page so charts that load near the viewport are rendered, then return to the top. */
+async function scrollThrough(page: Page) {
+  await page.evaluate(async () => {
+    for (let y = 0; y < document.body.scrollHeight; y += 400) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 60));
+    }
+    window.scrollTo(0, 0);
+  });
+}
+
 async function ready(page: Page) {
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByText(/Last run .* passed/).first()).toBeAttached();
@@ -16,7 +27,8 @@ for (const theme of ["dark", "light"] as const) {
       await page.setViewportSize({ width, height: width < 768 ? 812 : 900 });
       await page.goto("/");
       await ready(page);
-      await expect(page.locator("figure[role=img] svg.recharts-surface").first()).toBeVisible();
+      await scrollThrough(page);
+      await expect(page.locator("figure[role=img] svg.recharts-surface").first()).toBeAttached();
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       await page.screenshot({ path: `${SHOTS}/overview-${width}-${theme}.png`, fullPage: true });
     });

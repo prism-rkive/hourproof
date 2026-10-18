@@ -15,7 +15,7 @@ from starlette.responses import FileResponse, JSONResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-from .config import BACKTEST_JSON, CARBON_BACKTEST_JSON, DATA, DATASET_CSV, DATASET_META, DEMO_STATE, LIVE_JSON, WEB
+from .config import BACKTEST_JSON, CARBON_BACKTEST_JSON, DATA, DATASET_CSV, DATASET_META, DEMO_STATE, LIVE_JSON, ROOT, WEB
 from . import zk
 
 _run_lock = threading.Lock()
@@ -27,8 +27,36 @@ def _read(p: Path):
     return json.loads(p.read_text()) if p.exists() else None
 
 
+FRONTEND_DIST = ROOT / "frontend" / "dist"  # the React build (cd frontend && npm run build); web/ until it exists
+
+
+def _shell() -> Path | None:
+    """The client-rendered app (spa.html). Never a prerendered page: those carry the hosted snapshot's data, and this
+    server shows live data."""
+    for name in ("spa.html", "index.html"):
+        if (FRONTEND_DIST / name).exists():
+            return FRONTEND_DIST / name
+    return None
+
+
 async def index(_: Request):
-    return FileResponse(WEB / "index.html")
+    shell = _shell()
+    return FileResponse(shell if shell else WEB / "index.html")
+
+
+async def spa(request: Request):
+    """Client-side routes (/proof, /method, ...) get the app; a file in the build is served as itself; an unknown
+    /api path is a JSON 404, never the app (same rules as vercel.json)."""
+    path = request.path_params["path"]
+    if path.startswith("api/"):
+        return JSONResponse({"error": "not found"}, status_code=404)
+    shell = _shell()
+    if not shell:
+        return JSONResponse({"error": "not found"}, status_code=404)
+    f = (FRONTEND_DIST / path).resolve()
+    if f.is_file() and f.suffix != ".html" and FRONTEND_DIST.resolve() in f.parents:
+        return FileResponse(f)
+    return FileResponse(shell)
 
 
 @functools.lru_cache(maxsize=4)
@@ -182,4 +210,5 @@ app = Starlette(routes=[
     Route("/api/demo/run", run_demo, methods=["POST"]),
     Route("/api/demo/log", run_log),
     Mount("/static", StaticFiles(directory=WEB), name="static"),
+    Route("/{path:path}", spa),
 ])

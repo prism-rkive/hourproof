@@ -4,7 +4,7 @@ VENV  := .venv
 PY    := $(VENV)/bin/python
 export PATH := $(CURDIR)/$(VENV)/bin:$(HOME)/.hourproof/bin:$(HOME)/.foundry/bin:$(PATH)
 
-.PHONY: help setup tools venv doctor data backtest zk fixture test test-py test-sol test-noir demo demo-base serve e2e live-commit live-score clean wallet-new preflight-base verify-base verify-evidence site
+.PHONY: help setup tools venv doctor data backtest zk fixture test test-py test-sol test-noir demo demo-base serve e2e live-commit live-score clean wallet-new preflight-base verify-base verify-evidence site web test-web
 
 help:            ## list targets
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | sed 's/:.*##/\t/'
@@ -62,9 +62,15 @@ demo-base:       ## the same on Base Sepolia (needs PRIVATE_KEY in .env; run pre
 verify-base:     ## re-check the latest Base Sepolia run against the chain (receipts, code, proofs)
 	$(PY) -m hourproof verify
 
-site:            ## static dashboard snapshot for Vercel: deploy/snapshot/*.json + site/
+site:            ## static dashboard snapshot for Vercel: deploy/snapshot/*.json + site/ (needs Node 22: make web first)
 	$(PY) -m hourproof site export
 	bash scripts/build_site.sh
+
+web:             ## install and build the dashboard (frontend/, Node 22 + npm 11.20); make serve then uses it
+	cd frontend && npx --yes npm@11.20.0 ci && npm run build
+
+test-web:        ## dashboard checks: format, types, lint, unit tests, browser tests (needs make web)
+	cd frontend && npm run format:check && npm run typecheck && npm run lint && npm test && npx playwright test
 
 verify-evidence: ## re-check the committed evidence bundle on Base Sepolia (read-only, no key needed)
 	$(PY) -m hourproof verify --state evidence/base-sepolia-20261017T141639Z/state.json

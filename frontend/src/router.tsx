@@ -1,19 +1,25 @@
-import { createBrowserRouter, type RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import { RouteError } from "@/components/ErrorState";
 import { getOverview } from "@/lib/api";
-import type { Overview } from "@/lib/schemas";
+import { runInfo, type RunInfo } from "@/lib/selectors";
 
-export type RootData = { overview: Promise<Overview> };
+/** A resolved value when prerendered or hydrated; the shell renders it with <Await> either way. */
+export type RootData = { overview: RunInfo | Promise<RunInfo> };
 
 /**
- * The overview is shared by the whole shell (run status, footer) and the pages (same cached request). Not awaited:
- * the shell renders immediately. Fresh on every call, so revalidating while a local run is in progress updates it.
+ * The overview is shared by the whole shell (run status, footer) and the pages (same cached request). Fresh on every
+ * call, so revalidating while a local run is in progress updates it. Awaited, so the prerendered HTML and the
+ * hydration data contain it (the hosted pages are prerendered from the snapshot; see prerender.mjs).
  */
-export function rootLoader(): RootData {
-  const overview = getOverview(true);
-  overview.catch(() => {}); // handled where it is rendered (<Await errorElement>)
-  return { overview };
+export async function rootLoader(): Promise<RootData> {
+  try {
+    return { overview: runInfo(await getOverview(true)) };
+  } catch (e) {
+    const failed = Promise.reject(e);
+    failed.catch(() => {}); // shown where it is rendered (<Await errorElement>), the pages still load
+    return { overview: failed };
+  }
 }
 
 export const routes: RouteObject[] = [
@@ -40,5 +46,3 @@ export const routes: RouteObject[] = [
     ],
   },
 ];
-
-export const router = createBrowserRouter(routes);

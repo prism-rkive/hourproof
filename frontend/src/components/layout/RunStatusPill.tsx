@@ -1,8 +1,7 @@
 import { Suspense, useEffect } from "react";
 import { Await, Link, useRevalidator, useRouteLoaderData } from "react-router";
 import type { RootData } from "@/router";
-import type { Overview } from "@/lib/schemas";
-import { runStatus, type Tone } from "@/lib/selectors";
+import { runStatus, type RunInfo, type Tone } from "@/lib/selectors";
 import { cn } from "@/lib/utils";
 
 const DOT: Record<Tone, string> = {
@@ -14,7 +13,7 @@ const DOT: Record<Tone, string> = {
 
 const POLL_MS = 4000; // while a local run is in progress, refresh the status like the original dashboard did
 
-function Pill({ overview, variant }: { overview: Overview; variant: "bar" | "menu" }) {
+function Pill({ overview, variant }: { overview: RunInfo; variant: "bar" | "menu" }) {
   const s = runStatus(overview);
   const revalidator = useRevalidator();
   useEffect(() => {
@@ -83,7 +82,7 @@ export function RunStatusPill({ variant = "bar" }: { variant?: "bar" | "menu" })
   return (
     <Suspense fallback={<Placeholder variant={variant} text="Loading run status" />}>
       <Await resolve={data.overview} errorElement={<Placeholder variant={variant} text="Run status unavailable" />}>
-        {(o: Overview) => <Pill overview={o} variant={variant} />}
+        {(o: RunInfo) => <Pill overview={o} variant={variant} />}
       </Await>
     </Suspense>
   );

@@ -4,6 +4,7 @@
 !/frontend
 /frontend/node_modules
 /frontend/dist
+/frontend/dist-server
 /frontend/e2e/screenshots
 /frontend/test-results
 /frontend/playwright-report

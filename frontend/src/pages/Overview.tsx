@@ -1,4 +1,5 @@
 import { ArrowRight, BadgeCheck, Bot, FileSignature, Landmark, ShieldCheck } from "lucide-react";
+import { Hydrate } from "@/components/Hydrate";
 import { useState } from "react";
 import { Link, useLoaderData } from "react-router";
 import { ChartCard, DataTable } from "@/components/ChartCard";
@@ -14,12 +15,12 @@ import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { getOverview, getWeek } from "@/lib/api";
 import { bps, dayLabel, FULL_YEAR, int, networkName, pct, pctShort, tonnes, weekScope } from "@/lib/format";
 import type { Overview, Week, WeekData } from "@/lib/schemas";
-import { hero, runFigures, runWeekScope, weekView, type WeekMode } from "@/lib/selectors";
+import { hero, overviewForHome, runFigures, runWeekScope, weekView, type WeekMode } from "@/lib/selectors";
 import { pageMeta } from "@/routes";
 
 export async function loader() {
   const [overview, week] = await Promise.all([getOverview(), getWeek()]);
-  return { overview, week };
+  return { overview: overviewForHome(overview), week };
 }
 
 const MODES: { value: WeekMode; label: string; explain: string }[] = [
@@ -482,14 +483,22 @@ export function Component() {
   return (
     <Page className="space-y-16 sm:space-y-20">
       <Hero o={overview} />
-      <InPlainTerms o={overview} />
-      <KeyResults o={overview} />
-      {week.available ? (
-        <TheWeek o={overview} week={week} />
-      ) : (
-        <p className="text-sm text-muted-foreground">No week of data yet: run the agent backtest, then reload.</p>
-      )}
-      <HowItWorks />
+      <Hydrate>
+        <InPlainTerms o={overview} />
+      </Hydrate>
+      <Hydrate>
+        <KeyResults o={overview} />
+      </Hydrate>
+      <Hydrate>
+        {week.available ? (
+          <TheWeek o={overview} week={week} />
+        ) : (
+          <p className="text-sm text-muted-foreground">No week of data yet: run the agent backtest, then reload.</p>
+        )}
+      </Hydrate>
+      <Hydrate>
+        <HowItWorks />
+      </Hydrate>
     </Page>
   );
 }

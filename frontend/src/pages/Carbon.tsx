@@ -1,4 +1,5 @@
 import { ChevronDown, Lock, ShieldCheck } from "lucide-react";
+import { Hydrate } from "@/components/Hydrate";
 import { useState } from "react";
 import { useLoaderData } from "react-router";
 import { ChartCard, DataTable } from "@/components/ChartCard";
@@ -12,11 +13,12 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { Term } from "@/components/Term";
 import { getCarbon, getOverview } from "@/lib/api";
 import { bps, dayLabel, int, networkName, pct, testScope, weekScope } from "@/lib/format";
-import type { Carbon, CarbonData, Overview } from "@/lib/schemas";
+import type { Carbon, CarbonData } from "@/lib/schemas";
+import { runInfo, type RunInfo } from "@/lib/selectors";
 
 export async function loader() {
   const [carbon, overview] = await Promise.all([getCarbon(), getOverview()]);
-  return { carbon, overview };
+  return { carbon, overview: runInfo(overview) }; // the page only needs to know whether a run exists
 }
 
 const tonnesInt = (t: number) => `${int(t)} t`; // strategy totals: whole tonnes, as on the original page
@@ -312,7 +314,7 @@ function TheWeek({ c }: { c: CarbonData }) {
 /* ------------------------------------------------------------------------------------------------ page */
 
 export function Component() {
-  const { carbon: c, overview: o } = useLoaderData() as { carbon: Carbon; overview: Overview };
+  const { carbon: c, overview: o } = useLoaderData() as { carbon: Carbon; overview: RunInfo };
   if (!c.available) {
     return (
       <Page>
@@ -349,14 +351,20 @@ export function Component() {
 
       <section aria-labelledby="res-h" className="space-y-5">
         <SectionHeading id="res-h" title="Emissions by strategy" sub="Lower is better." />
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)]">
-          <Strategies c={c} />
-          <ProofCard c={c} scope={proofScope} />
-        </div>
-        <Robustness c={c} />
+        <Hydrate>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)]">
+            <Strategies c={c} />
+            <ProofCard c={c} scope={proofScope} />
+          </div>
+          <Robustness c={c} />
+        </Hydrate>
       </section>
 
-      {c.week && <TheWeek c={c} />}
+      {c.week && (
+        <Hydrate>
+          <TheWeek c={c} />
+        </Hydrate>
+      )}
 
       <section data-scope={test} aria-labelledby="cav-h">
         <details className="group rounded-xl border border-border bg-card shadow-xs">

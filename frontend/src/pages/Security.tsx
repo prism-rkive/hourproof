@@ -86,6 +86,12 @@ function AttackCard({ r, index }: { r: Row; index: number }) {
           </div>
           <h3 className="mt-2 text-base font-medium text-pretty">{r.a.title}</h3>
           {PLAIN[r.a.id] && <p className="mt-1.5 text-sm text-pretty text-muted-foreground">{PLAIN[r.a.id]}</p>}
+          {r.a.note && (
+            <p className="mt-2 rounded-md bg-muted px-3 py-2 font-mono text-xs leading-relaxed break-words">
+              <span className="font-sans text-muted-foreground">Recorded by the run: </span>
+              {r.a.note}
+            </p>
+          )}
         </div>
         <dl className="grid shrink-0 grid-cols-2 gap-x-6 gap-y-3 text-13 sm:grid-cols-3 lg:w-[26rem] lg:grid-cols-2">
           <div>

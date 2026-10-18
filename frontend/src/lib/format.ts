@@ -107,6 +107,11 @@ export function shortHash(h: string, head = 6, tail = 6): string {
   return h.length > head + tail + 3 ? `${h.slice(0, head + 2)}…${h.slice(-tail)}` : h;
 }
 
+/** A step's recorded duration as recorded: "220.8 s". */
+export function seconds(s: number): string {
+  return `${s.toFixed(1)} s`;
+}
+
 /** Seconds as "4 min 10 s" / "42.2 s". */
 export function duration(seconds: number): string {
   if (seconds < 60) return `${seconds.toFixed(1)} s`;

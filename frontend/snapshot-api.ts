@@ -3,6 +3,7 @@
  * and the local Python server expose, for `vite` and `vite preview`. The files are read on every request, never
  * copied or edited. To use the live local API instead (`make serve`), start Vite with HP_API=http://127.0.0.1:8000.
  */
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { Connect, Plugin } from "vite";
@@ -41,6 +42,15 @@ export function snapshotApi(): Plugin {
     },
     configurePreviewServer(server) {
       server.middlewares.use(handler);
+      // Like vercel.json: /proof is dist/proof.html (prerendered), any other page path is the client-rendered shell.
+      const dist = resolve(server.config.root, server.config.build.outDir);
+      server.middlewares.use((req, _res, next) => {
+        const path = (req.url ?? "").split("?")[0] ?? "";
+        if (path !== "/" && !path.includes(".") && !path.startsWith("/api/")) {
+          req.url = existsSync(resolve(dist, `${path.slice(1)}.html`)) ? `${path}.html` : "/spa.html";
+        }
+        next();
+      });
     },
   };
 }

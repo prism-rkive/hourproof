@@ -121,7 +121,8 @@ make doctor         # everything green?
 make data           # real Energinet data for 2025 (first time ~30-50 min: the API rate-limits; cached after)
 .venv/bin/python -m hourproof data import-carbon hp_ai   # the carbon kill test's downloads (no network)
 make e2e            # backtests, ZK verifiers, real proofs, all tests, both on-chain demos; prints a checklist
-make serve          # dashboard on http://127.0.0.1:8000
+make web            # build the dashboard (frontend/; needs Node 22, uses npm 11.20 via npx)
+make serve          # dashboard on http://127.0.0.1:8000 (live API and run buttons)
 ```
 
 If Energinet answers HTTP 403, your IP is blocked: the client stops instead of retrying (retrying makes a block
@@ -198,22 +199,39 @@ the rule, so the KPI was missed and the coupon stepped up to 6 %. The rule's fou
 from 47 t to 1,071 t, because the residual depends heavily on the wind. `--mode procurement` runs the
 original coverage-only scenario.
 
+## The dashboard (`frontend/`)
+
+Seven pages (Overview, Proof run, Security, Agent, Carbon, Note, Method), built with Vite, React, TypeScript, React
+Router, Tailwind and Recharts. Every figure is read from the API data, never typed in; every page explains itself in
+plain terms and underlines jargon with a definition. Locally, `make serve` serves it with the live API and the run
+buttons. `make test-web` runs its checks: format, types, lint, unit tests against the committed snapshot, and browser
+tests (every page in both themes at 375 and 1440 px, no console or hydration errors, and parity with the original
+dashboard: every figure and every one of the 80 transaction links).
+
+```bash
+cd frontend && npx --yes npm@11.20.0 ci   # pinned: Node 22, npm 11.20 (engine-strict)
+npm run dev                               # http://localhost:5173, data from deploy/snapshot (HP_API=http://127.0.0.1:8000 for the live API)
+npm run build                             # dist/: every page prerendered from the snapshot, plus spa.html
+```
+
 ## Deploy the dashboard (Vercel)
 
-The hosted dashboard is a **static snapshot of the verified Base Sepolia run**: the same `web/` frontend, reading three
-JSON files exported by the dashboard's own API code from `evidence/`. It cannot start runs (`make serve` runs the full
-dashboard locally, with the run buttons). No secrets, data files or keys are uploaded: `.vercelignore` allows only
-`web/`, `deploy/`, `scripts/build_site.sh` and `vercel.json`.
+The hosted dashboard is a **static snapshot of the verified Base Sepolia run**: the pages are prerendered at build
+time from four JSON files exported by the dashboard's own API code from `evidence/` (the overview, the week, the
+carbon results and the run's recorded console log). It cannot start runs (`make serve` runs the full dashboard
+locally, with the run buttons) and never calls the chain. No secrets, data files or keys are uploaded:
+`.vercelignore` allows only `frontend/` (without `node_modules` and builds), `deploy/`, `scripts/build_site.sh`,
+`vercel.json` and the root `package.json` (which only pins Node 22 for Vercel).
 
 ```bash
 make site                       # python -m hourproof site export (-> deploy/snapshot/*.json) + bash scripts/build_site.sh
 npx vercel login                # once
-npx vercel deploy               # preview: Vercel runs scripts/build_site.sh and serves site/ (see vercel.json)
+npx vercel deploy               # preview: Vercel installs frontend/ with npm 11.20, runs scripts/build_site.sh, serves site/
 npx vercel deploy --prod        # production, after checking the preview
 ```
 
-Or import the GitHub repository in the Vercel dashboard: `vercel.json` sets the build command, the output directory
-and the `/api/*` rewrites; no environment variables are needed.
+Or import the GitHub repository in the Vercel dashboard: `vercel.json` sets the install and build commands, the
+output directory, clean URLs, the `/api/*` rewrites and the fallback; no environment variables are needed.
 
 ## Layout
 
@@ -222,7 +240,9 @@ contracts/   Foundry: src/ (8 contracts; generated verifiers are built by `make 
              UltraHonk fixtures), lib/ (vendored forge-std and evm-ml-dsa-verifier, with their licences)
 circuits/    Noir workspace: hp_lib (shared commitment), coverage, emissions, load_commit (data hub)
 hourproof/   Python: eds, dataset, agent, carbon, zk, pq, chain (cast), demo, live, verify, site, server, CLI
-web/         Dashboard frontend (no build step)
+frontend/    Dashboard (Vite + React + TypeScript): src/pages, src/components, src/lib (schemas, selectors, formatting),
+             prerender.mjs, e2e/ (Playwright)
+web/         The original dashboard, kept until the new one replaces it
 tests/       Python unittest suite
 docs/        SECURITY.md (threat model), ARCHITECTURE.md, AGENT_RESULTS.md, CARBON_RESULTS.md, BASE_SEPOLIA.md
 evidence/    The verified Base Sepolia run (state, plans, submitted proofs, verification logs) and the two failed attempts

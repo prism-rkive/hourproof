@@ -1,4 +1,6 @@
 import { lazy, Suspense } from "react";
+import { useIsClient } from "@/hooks/useIsClient";
+import { useNearViewport } from "@/hooks/useNearViewport";
 import type { HourlyChartProps } from "./HourlyChart";
 import type { IntensityChartProps } from "./IntensityChart";
 
@@ -12,22 +14,34 @@ function ChartSkeleton({ height }: { height: number }) {
 
 export function HourlyChart(props: HourlyChartProps & { ariaLabel: string }) {
   const height = props.height ?? 200;
+  const client = useIsClient();
+  const [ref, near] = useNearViewport<HTMLElement>();
   return (
-    <figure role="img" aria-label={props.ariaLabel} className="m-0">
-      <Suspense fallback={<ChartSkeleton height={height} />}>
-        <HourlyChartImpl {...props} />
-      </Suspense>
+    <figure ref={ref} role="img" aria-label={props.ariaLabel} className="m-0">
+      {client && near ? (
+        <Suspense fallback={<ChartSkeleton height={height} />}>
+          <HourlyChartImpl {...props} />
+        </Suspense>
+      ) : (
+        <ChartSkeleton height={height} /> // prerendered HTML, or not yet near the viewport
+      )}
     </figure>
   );
 }
 
 export function IntensityChart(props: IntensityChartProps & { ariaLabel: string }) {
   const height = props.height ?? 240;
+  const client = useIsClient();
+  const [ref, near] = useNearViewport<HTMLElement>();
   return (
-    <figure role="img" aria-label={props.ariaLabel} className="m-0">
-      <Suspense fallback={<ChartSkeleton height={height} />}>
-        <IntensityChartImpl {...props} />
-      </Suspense>
+    <figure ref={ref} role="img" aria-label={props.ariaLabel} className="m-0">
+      {client && near ? (
+        <Suspense fallback={<ChartSkeleton height={height} />}>
+          <IntensityChartImpl {...props} />
+        </Suspense>
+      ) : (
+        <ChartSkeleton height={height} /> // prerendered HTML, or not yet near the viewport
+      )}
     </figure>
   );
 }

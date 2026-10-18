@@ -10,6 +10,8 @@
     />
     <meta name="color-scheme" content="dark light" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- every page's shell reads the run status: fetch it in parallel with the app code, not after it -->
+    <link rel="preload" href="/api/overview" as="fetch" crossorigin="anonymous" />
     <script>
       // Theme before first paint (no flash): the saved choice, else the OS preference, else dark.
       (function () {

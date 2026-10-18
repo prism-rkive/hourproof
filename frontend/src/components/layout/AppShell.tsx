@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Hydrate } from "@/components/Hydrate";
 import { Outlet, ScrollRestoration, useLocation, useNavigation } from "react-router";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -49,9 +50,13 @@ export function AppShell() {
         <RouteProgress />
         <TopNav />
         <main id="main" ref={main} tabIndex={-1} className="flex-1 focus:outline-none">
-          <Outlet />
+          <Hydrate>
+            <Outlet />
+          </Hydrate>
         </main>
-        <Footer />
+        <Hydrate>
+          <Footer />
+        </Hydrate>
         <ScrollRestoration />
       </div>
     </TooltipProvider>

@@ -12,6 +12,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link, useLoaderData, useRevalidator } from "react-router";
 import { CopyButton } from "@/components/CopyButton";
+import { Hydrate } from "@/components/Hydrate";
 import { Page } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ScopeTag } from "@/components/ScopeTag";
@@ -21,7 +22,7 @@ import { Term } from "@/components/Term";
 import { TxList } from "@/components/TxList";
 import { Button } from "@/components/ui/button";
 import { getLog, getOverview, startRun } from "@/lib/api";
-import { duration, int, networkName, THIS_RUN, utcDateTime } from "@/lib/format";
+import { duration, int, networkName, seconds, THIS_RUN, utcDateTime } from "@/lib/format";
 import type { DemoState, Overview, RunLog, Step } from "@/lib/schemas";
 import { REPO_URL } from "@/routes";
 import { cn } from "@/lib/utils";
@@ -258,7 +259,7 @@ function StepCard({ step, index, open, onToggle }: { step: Step; index: number; 
             <span className="block text-sm font-medium text-pretty">{step.title}</span>
             <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-subtle-foreground sm:hidden">
               <StatusBadge tone={t.tone}>{t.label}</StatusBadge>
-              {step.seconds != null && <span className="tabular">{duration(step.seconds)}</span>}
+              {step.seconds != null && <span className="tabular">{seconds(step.seconds)}</span>}
               {step.txs.length > 0 && <span>{step.txs.length} tx</span>}
             </span>
           </span>
@@ -268,7 +269,7 @@ function StepCard({ step, index, open, onToggle }: { step: Step; index: number; 
                 {step.txs.length} {step.txs.length === 1 ? "transaction" : "transactions"}
               </span>
             )}
-            {step.seconds != null && <span className="tabular w-16 text-right">{duration(step.seconds)}</span>}
+            {step.seconds != null && <span className="tabular w-16 text-right">{seconds(step.seconds)}</span>}
             <StatusBadge tone={t.tone}>{t.label}</StatusBadge>
           </span>
           <ChevronDown
@@ -281,24 +282,33 @@ function StepCard({ step, index, open, onToggle }: { step: Step; index: number; 
         </button>
       </h3>
       <div id={bodyId} hidden={!open} className="space-y-4 border-t border-border px-4 py-4 sm:px-5">
-        {STEP_PLAIN[step.id] && (
-          <p className="flex gap-2 text-sm text-muted-foreground">
-            <Lightbulb className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
-            <span>{STEP_PLAIN[step.id]}</span>
-          </p>
-        )}
-        {step.detail && (
-          <p className="rounded-md bg-muted px-3 py-2 font-mono text-xs leading-relaxed break-words">{step.detail}</p>
-        )}
-        {isVerify && <VerifyChecks step={step} />}
-        {ATTACK_STEPS.has(step.id) && (
-          <Link to="/security" className="inline-flex text-13 font-medium underline-offset-4 hover:underline">
-            Each attack, what refused it, and why →
-          </Link>
-        )}
-        <TxList txs={step.txs} />
+        {open && <StepBody step={step} isVerify={isVerify} />}
       </div>
     </li>
+  );
+}
+
+/** A step's content, rendered when the step is opened (keeps the page light to load and hydrate). */
+function StepBody({ step, isVerify }: { step: Step; isVerify: boolean }) {
+  return (
+    <>
+      {STEP_PLAIN[step.id] && (
+        <p className="flex gap-2 text-sm text-muted-foreground">
+          <Lightbulb className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
+          <span>{STEP_PLAIN[step.id]}</span>
+        </p>
+      )}
+      {step.detail && (
+        <p className="rounded-md bg-muted px-3 py-2 font-mono text-xs leading-relaxed break-words">{step.detail}</p>
+      )}
+      {isVerify && <VerifyChecks step={step} />}
+      {ATTACK_STEPS.has(step.id) && (
+        <Link to="/security" className="inline-flex text-13 font-medium underline-offset-4 hover:underline">
+          Each attack, what refused it, and why →
+        </Link>
+      )}
+      <TxList txs={step.txs} />
+    </>
   );
 }
 
@@ -450,12 +460,16 @@ export function Component() {
       {demo ? (
         <>
           <RunSummary demo={demo} o={o} />
-          <Steps demo={demo} />
+          <Hydrate>
+            <Steps demo={demo} />
+          </Hydrate>
         </>
       ) : (
         <p className="text-sm text-muted-foreground">No run yet. Start one on a local server with the buttons above.</p>
       )}
-      <LogPanel log={log} runId={demo?.run_id} />
+      <Hydrate>
+        <LogPanel log={log} runId={demo?.run_id} />
+      </Hydrate>
     </Page>
   );
 }

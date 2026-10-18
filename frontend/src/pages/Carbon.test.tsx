@@ -56,6 +56,7 @@ describe("Carbon", () => {
 
   it("labels the period of every figure", async () => {
     await renderRoute("/carbon");
+    for (const b of screen.getAllByRole("button", { name: "View as table" })) await userEvent.click(b);
     expect(figuresWithoutScope(document.getElementById("main")!).unscoped).toEqual([]);
   });
 });

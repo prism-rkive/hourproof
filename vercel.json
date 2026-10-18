@@ -4,32 +4,69 @@
   "installCommand": "cd frontend && npx --yes npm@11.20.0 -v && npx --yes npm@11.20.0 ci --no-audit --no-fund",
   "buildCommand": "bash scripts/build_site.sh",
   "outputDirectory": "site",
-  "cleanUrls": false,
+  "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/api/overview", "destination": "/api/overview.json" },
-    { "source": "/api/week", "destination": "/api/week.json" },
-    { "source": "/api/carbon", "destination": "/api/carbon.json" },
-    { "source": "/api/demo/log", "destination": "/api/log.json" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/api/overview",
+      "destination": "/api/overview.json"
+    },
+    {
+      "source": "/api/week",
+      "destination": "/api/week.json"
+    },
+    {
+      "source": "/api/carbon",
+      "destination": "/api/carbon.json"
+    },
+    {
+      "source": "/api/demo/log",
+      "destination": "/api/log.json"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/spa.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
       ]
     },
     {
       "source": "/api/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=300" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300"
+        }
+      ]
     },
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }

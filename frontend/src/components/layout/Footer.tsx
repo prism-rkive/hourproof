@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import { Await, Link, useRouteLoaderData } from "react-router";
 import type { RootData } from "@/router";
-import type { Overview } from "@/lib/schemas";
-import { lastRunLine } from "@/lib/selectors";
+import { lastRunLine, type RunInfo } from "@/lib/selectors";
 import { DATA_SOURCE_URL, PAGES, REPO_URL } from "@/routes";
 import { LogoMark } from "./Logo";
 
@@ -15,7 +14,7 @@ function LastRun() {
   return (
     <Suspense fallback={null}>
       <Await resolve={data.overview} errorElement={null}>
-        {(o: Overview) => {
+        {(o: RunInfo) => {
           const line = lastRunLine(o);
           if (!line) return null;
           const evidence = o.static_snapshot?.evidence;
@@ -28,7 +27,7 @@ function LastRun() {
                   <a
                     href={`${REPO_URL}/tree/main/${evidence}`}
                     {...external}
-                    className={`${linkCls} underline-offset-4 hover:underline`}
+                    className={`${linkCls} underline underline-offset-4`}
                   >
                     evidence
                   </a>
@@ -92,7 +91,7 @@ export function Footer() {
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-5 text-xs text-subtle-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <span>
             Data:{" "}
-            <a href={DATA_SOURCE_URL} {...external} className={`${linkCls} underline-offset-4 hover:underline`}>
+            <a href={DATA_SOURCE_URL} {...external} className={`${linkCls} underline underline-offset-4`}>
               Energi Data Service, Energinet
             </a>
             . Contracts, circuits and agent: this repository.

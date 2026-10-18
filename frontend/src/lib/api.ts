@@ -1,5 +1,9 @@
 import type { z } from "zod";
-import { Carbon, Overview, RunLog, Week } from "./schemas";
+import type * as Schemas from "./schemas";
+
+/** The response schemas by name. They (and zod) load on the first request, which never happens during hydration. */
+type SchemaName = "Overview" | "Week" | "Carbon" | "RunLog";
+type Parsed<K extends SchemaName> = z.infer<(typeof Schemas)[K]>;
 
 export class ApiError extends Error {
   constructor(
@@ -12,7 +16,7 @@ export class ApiError extends Error {
   }
 }
 
-async function getJSON<S extends z.ZodTypeAny>(path: string, schema: S): Promise<z.infer<S>> {
+async function getJSON<K extends SchemaName>(path: string, name: K): Promise<Parsed<K>> {
   let res: Response;
   try {
     res = await fetch(path, { headers: { Accept: "application/json" } });
@@ -20,7 +24,8 @@ async function getJSON<S extends z.ZodTypeAny>(path: string, schema: S): Promise
     throw new ApiError(`Could not reach ${path}`, path);
   }
   if (!res.ok) throw new ApiError(`${path} answered HTTP ${res.status}`, path, res.status);
-  const parsed = schema.safeParse(await res.json());
+  const [body, schemas] = await Promise.all([res.json(), import("./schemas")]);
+  const parsed = (schemas[name] as z.ZodTypeAny).safeParse(body);
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
     throw new ApiError(
@@ -36,19 +41,19 @@ async function getJSON<S extends z.ZodTypeAny>(path: string, schema: S): Promise
  * host). `fresh` re-fetches, for the live local server while a run is in progress.
  */
 const cache = new Map<string, Promise<unknown>>();
-function cached<S extends z.ZodTypeAny>(path: string, schema: S, fresh = false): Promise<z.infer<S>> {
+function cached<K extends SchemaName>(path: string, name: K, fresh = false): Promise<Parsed<K>> {
   if (fresh || !cache.has(path)) {
-    const p = getJSON(path, schema);
+    const p = getJSON(path, name);
     p.catch(() => cache.delete(path)); // a failed request is retried next time
     cache.set(path, p);
   }
-  return cache.get(path) as Promise<z.infer<S>>;
+  return cache.get(path) as Promise<Parsed<K>>;
 }
 
-export const getOverview = (fresh = false) => cached("/api/overview", Overview, fresh);
-export const getWeek = (fresh = false) => cached("/api/week", Week, fresh);
-export const getCarbon = (fresh = false) => cached("/api/carbon", Carbon, fresh);
-export const getLog = (fresh = false) => cached("/api/demo/log", RunLog, fresh);
+export const getOverview = (fresh = false) => cached("/api/overview", "Overview", fresh);
+export const getWeek = (fresh = false) => cached("/api/week", "Week", fresh);
+export const getCarbon = (fresh = false) => cached("/api/carbon", "Carbon", fresh);
+export const getLog = (fresh = false) => cached("/api/demo/log", "RunLog", fresh);
 
 /** Start a run on the local server (the hosted snapshot cannot). Same request as the original dashboard. */
 export async function startRun(network: "local" | "base-sepolia"): Promise<string | null> {

@@ -64,7 +64,7 @@ export function ChartCard({
           </div>
           {table && (
             <div id={tableId} hidden={!showTable}>
-              {table}
+              {showTable && table /* rendered on demand: keeps the page light to load and hydrate */}
             </div>
           )}
         </div>

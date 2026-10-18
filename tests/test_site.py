@@ -24,6 +24,12 @@ class VercelConfigTests(unittest.TestCase):
                       if ".test." not in p.name)
         read = set(re.findall(r'"(/api/[a-z/]+)"', src))
         self.assertIn("/api/overview", read)
+        # The run buttons' POST exists only on the local server; the hosted snapshot disables them.
+        self.assertIn("/api/demo/run", read)
+        read.discard("/api/demo/run")
+        from hourproof import server
+        self.assertIn(("/api/demo/run", frozenset({"POST"})), {(r.path, frozenset(r.methods - {"HEAD"}))
+                                                                for r in server.app.routes if getattr(r, "methods", None)})
         rewrites = self.rewrites()
         for path in read:
             self.assertIn(path, rewrites, path)
@@ -36,7 +42,8 @@ class VercelConfigTests(unittest.TestCase):
 
     def test_spa_fallback_serves_the_app_for_every_page_but_not_for_the_api(self):
         rules = json.loads((ROOT / "vercel.json").read_text())["rewrites"]
-        self.assertEqual(rules[-1]["destination"], "/index.html")  # last: real files and /api rules win first
+        self.assertEqual(rules[-1]["destination"], "/spa.html")  # last: real files and /api rules win first
+        self.assertTrue(json.loads((ROOT / "vercel.json").read_text())["cleanUrls"])  # /proof is the prerendered proof.html
         fallback = re.compile("^" + rules[-1]["source"] + "$")
         for page in ("/", "/proof", "/security", "/agent", "/carbon", "/note", "/method", "/no-such-page"):
             self.assertTrue(fallback.match(page), page)
@@ -145,8 +152,14 @@ class BuildScriptTests(unittest.TestCase):
         out = subprocess.run(["bash", "scripts/build_site.sh"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(out.returncode, 0, out.stderr)
         files = {p.relative_to(ROOT / "site").as_posix() for p in (ROOT / "site").rglob("*") if p.is_file()}
-        self.assertTrue({"index.html", "favicon.svg", "api/overview.json", "api/week.json", "api/carbon.json",
-                         "api/log.json"} <= files)
+        pages = {"index.html", "proof.html", "security.html", "agent.html", "carbon.html", "note.html", "method.html"}
+        self.assertTrue(pages | {"spa.html", "favicon.svg", "robots.txt", "api/overview.json", "api/week.json",
+                                 "api/carbon.json", "api/log.json"} <= files)
+        for page in pages:  # prerendered: the content is in the HTML, with the data it was rendered from
+            html = (ROOT / "site" / page).read_text(encoding="utf-8")
+            self.assertIn("<h1", html, page)
+            self.assertIn("__staticRouterHydrationData", html, page)
+        self.assertNotIn("<h1", (ROOT / "site" / "spa.html").read_text(encoding="utf-8"))
         self.assertTrue(any(re.fullmatch(r"assets/index-[\w-]+\.js", f) for f in files))
         for name in ("overview", "week", "carbon", "log"):
             self.assertEqual((ROOT / "site" / "api" / f"{name}.json").read_bytes(), (SNAP / f"{name}.json").read_bytes())

@@ -15,6 +15,7 @@ describe("Overview", () => {
   it("labels the period of every displayed figure, in both views of the week", async () => {
     await renderRoute("/");
     const main = document.getElementById("main")!;
+    for (const b of screen.getAllByRole("button", { name: "View as table" })) await userEvent.click(b); // tables too
     let r = figuresWithoutScope(main);
     expect(r.figures.length).toBeGreaterThan(20);
     expect(r.unscoped).toEqual([]);

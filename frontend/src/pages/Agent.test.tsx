@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
 import { figuresWithoutScope, renderRoute } from "@/test/render";
 import { snapshot } from "@/test/snapshot";
@@ -43,6 +44,7 @@ describe("Agent", () => {
 
   it("labels the period of every figure", async () => {
     await renderRoute("/agent");
+    for (const b of screen.getAllByRole("button", { name: "View as table" })) await userEvent.click(b);
     expect(figuresWithoutScope(document.getElementById("main")!).unscoped).toEqual([]);
   });
 });
