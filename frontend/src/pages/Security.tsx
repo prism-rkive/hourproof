@@ -10,10 +10,10 @@ import { TxList } from "@/components/TxList";
 import { getOverview } from "@/lib/api";
 import { THIS_RUN } from "@/lib/format";
 import type { Attack, Overview, Tx } from "@/lib/schemas";
-import { step } from "@/lib/selectors";
+import { slimOverview, step } from "@/lib/selectors";
 
 export async function loader() {
-  return { overview: await getOverview() };
+  return { overview: slimOverview(await getOverview(), { attacks: true, steps: ["attacks_supply"], txs: true }) };
 }
 
 /** What each attempt tries and why it fails, in plain words. */

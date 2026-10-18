@@ -11,10 +11,12 @@ import { TxList } from "@/components/TxList";
 import { getOverview } from "@/lib/api";
 import { int, pct, testScope, THIS_RUN } from "@/lib/format";
 import type { Overview } from "@/lib/schemas";
-import { step } from "@/lib/selectors";
+import { slimOverview, step } from "@/lib/selectors";
 
 export async function loader() {
-  return { overview: await getOverview() };
+  return {
+    overview: slimOverview(await getOverview(), { backtest: true, steps: ["agent_commit", "agent_reveal"], txs: true }),
+  };
 }
 
 type Backtest = {

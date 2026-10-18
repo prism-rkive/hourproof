@@ -12,11 +12,18 @@ import { TxList } from "@/components/TxList";
 import { getOverview } from "@/lib/api";
 import { bps, int, THIS_RUN, tonnes, unixUtc, weeksScope } from "@/lib/format";
 import type { Overview } from "@/lib/schemas";
-import { runFigures, runWeekScope, step } from "@/lib/selectors";
+import { runFigures, runWeekScope, slimOverview, step } from "@/lib/selectors";
 import { cn } from "@/lib/utils";
 
 export async function loader() {
-  return { overview: await getOverview() };
+  return {
+    overview: slimOverview(await getOverview(), {
+      demoKeys: ["note_terms"],
+      window: true,
+      steps: ["prove", "prove_emissions", "note"],
+      txs: true,
+    }),
+  };
 }
 
 type Terms = {

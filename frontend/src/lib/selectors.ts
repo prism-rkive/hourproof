@@ -31,6 +31,49 @@ export function runInfo(o: Overview): RunInfo {
   };
 }
 
+/** What a page needs from the overview; everything else is left out of its prerendered data. */
+export type SlimSpec = {
+  dataset?: boolean;
+  backtest?: boolean;
+  zk?: boolean;
+  demoKeys?: string[]; // extra fields of the run (e.g. note_terms, contracts)
+  window?: boolean; // only the week's start, for the period labels
+  steps?: string[] | "all";
+  txs?: boolean; // keep the steps' transactions
+  attacks?: boolean;
+};
+
+/** The overview reduced to what one page renders. Values are passed through unchanged. */
+export function slimOverview(o: Overview, spec: SlimSpec): Overview {
+  const d = o.demo as (DemoState & Record<string, unknown>) | null;
+  const win = (d as { window?: { window_start_utc?: string } } | null)?.window;
+  const keep = new Set(spec.steps === "all" ? (d?.steps.map((x) => x.id) ?? []) : (spec.steps ?? []));
+  return {
+    running: o.running,
+    dataset: spec.dataset ? o.dataset : null,
+    annual_match: null,
+    backtest: spec.backtest ? o.backtest : null,
+    ...(spec.zk ? { zk: (o as Record<string, unknown>).zk } : {}),
+    ...(o.static_snapshot ? { static_snapshot: o.static_snapshot } : {}),
+    demo: d
+      ? {
+          run_id: d.run_id,
+          network: d.network,
+          status: d.status,
+          mode: d.mode,
+          zk_mode: d.zk_mode,
+          started_utc: d.started_utc,
+          finished_utc: d.finished_utc,
+          summary: d.summary,
+          attacks: spec.attacks ? d.attacks : [],
+          steps: d.steps.filter((x) => keep.has(x.id)).map((x) => (spec.txs ? x : { ...x, txs: [] })),
+          ...Object.fromEntries((spec.demoKeys ?? []).filter((k) => k in d).map((k) => [k, d[k]])),
+          ...(spec.window && win?.window_start_utc ? { window: { window_start_utc: win.window_start_utc } } : {}),
+        }
+      : null,
+  };
+}
+
 /**
  * The overview with only what the Overview page reads (dataset, the annual match, the run's summary, the metrics of
  * the prove / emissions / note steps and the week's start), so its prerendered page does not carry unused data.

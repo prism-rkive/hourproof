@@ -11,12 +11,21 @@ import { LIMITS } from "@/content/limits";
 import { getCarbon, getOverview } from "@/lib/api";
 import { FULL_YEAR, int, pct, shortHash, THIS_RUN } from "@/lib/format";
 import type { Carbon, Overview } from "@/lib/schemas";
-import { metric } from "@/lib/selectors";
+import { metric, slimOverview } from "@/lib/selectors";
 import { DATA_SOURCE_URL } from "@/routes";
 
 export async function loader() {
   const [overview, carbon] = await Promise.all([getOverview(), getCarbon()]);
-  return { overview, carbon };
+  return {
+    overview: slimOverview(overview, {
+      dataset: true,
+      backtest: true,
+      zk: true,
+      demoKeys: ["contracts"],
+      steps: ["prove", "prove_emissions"],
+    }),
+    carbon,
+  };
 }
 
 const PARAMS = "Declared parameter";

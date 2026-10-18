@@ -24,12 +24,13 @@ import { Button } from "@/components/ui/button";
 import { getLog, getOverview, startRun } from "@/lib/api";
 import { duration, int, networkName, seconds, THIS_RUN, utcDateTime } from "@/lib/format";
 import type { DemoState, Overview, RunLog, Step } from "@/lib/schemas";
+import { slimOverview } from "@/lib/selectors";
 import { REPO_URL } from "@/routes";
 import { cn } from "@/lib/utils";
 
 export async function loader() {
   const [overview, log] = await Promise.all([getOverview(), getLog().catch(() => null)]);
-  return { overview, log };
+  return { overview: slimOverview(overview, { steps: "all", txs: true }), log };
 }
 
 /** What each step does, for a reader new to the field. Shown inside the step, under its title. */

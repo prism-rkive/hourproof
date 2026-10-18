@@ -36,12 +36,20 @@ const escape = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/
 
 if (!template.includes('<div id="root"></div>')) throw new Error("dist/index.html has no empty #root to fill");
 
-// Preload the text font, so it is ready before the first paint and text does not reflow when it arrives.
-const inter = (await readdir(resolve(here, "dist", "assets"))).find((f) =>
-  /^inter-latin-wght-normal-.*\.woff2$/.test(f),
-);
-if (!inter) throw new Error("the Inter latin font file is missing from dist/assets");
-const fontPreload = `<link rel="preload" href="/assets/${inter}" as="font" type="font/woff2" crossorigin="anonymous" />`;
+// Preload the text font at low priority: it starts early, after the HTML and CSS that the first paint needs, so it
+// is usually ready before text reflows, without delaying that first paint.
+const assets = await readdir(resolve(here, "dist", "assets"));
+const fonts = [/^inter-latin-wght-normal-.*\.woff2$/, /^jetbrains-mono-latin-wght-normal-.*\.woff2$/].map((re) => {
+  const f = assets.find((x) => re.test(x));
+  if (!f) throw new Error(`a latin font file is missing from dist/assets (${re})`);
+  return f;
+});
+const fontPreload = fonts
+  .map(
+    (f) =>
+      `<link rel="preload" href="/assets/${f}" as="font" type="font/woff2" crossorigin="anonymous" fetchpriority="low" />`,
+  )
+  .join("\n    ");
 template = template.replace(
   "</title>",
   `</title>
