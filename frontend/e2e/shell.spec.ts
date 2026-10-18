@@ -4,7 +4,7 @@
  */
 import { expect, test, type Page } from "@playwright/test";
 
-const SHOTS = "e2e/screenshots";
+const SHOTS = process.env.HP_SHOTS ?? "e2e/screenshots";
 const THEMES = ["dark", "light"] as const;
 
 async function ready(page: Page) {

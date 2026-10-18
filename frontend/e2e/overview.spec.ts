@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const SHOTS = "e2e/screenshots";
+const SHOTS = process.env.HP_SHOTS ?? "e2e/screenshots";
 const PAGES = ["/", "/proof", "/security", "/agent", "/carbon", "/note", "/method"];
 
 /** Scroll through the page so charts that load near the viewport are rendered, then return to the top. */

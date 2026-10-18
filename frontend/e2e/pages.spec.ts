@@ -1,7 +1,7 @@
 /** Full-page screenshots of each built page at 375 and 1440 px, in both themes, for review. */
 import { expect, test, type Page } from "@playwright/test";
 
-const SHOTS = "e2e/screenshots";
+const SHOTS = process.env.HP_SHOTS ?? "e2e/screenshots";
 
 /** Scroll through the page so charts that load near the viewport are rendered, then return to the top. */
 async function scrollThrough(page: Page) {
@@ -14,7 +14,7 @@ async function scrollThrough(page: Page) {
   });
 }
 
-const PAGES = (process.env.HP_PAGES ?? "overview,proof,note,security,agent,carbon,method").split(",");
+const PAGES = (process.env.HP_PAGES ?? "overview,proof,note,security,agent,carbon,method,404").split(",");
 
 for (const name of PAGES) {
   for (const theme of ["dark", "light"] as const) {
@@ -25,7 +25,7 @@ for (const name of PAGES) {
         page.on("pageerror", (e) => errors.push(e.message));
         await page.emulateMedia({ colorScheme: theme });
         await page.setViewportSize({ width, height: width < 768 ? 812 : 900 });
-        await page.goto(name === "overview" ? "/" : `/${name}`);
+        await page.goto(name === "overview" ? "/" : name === "404" ? "/no-such-page" : `/${name}`);
         await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
         await expect(page.getByText(/Last run .* passed/).first()).toBeAttached();
         await page.evaluate(() => document.fonts.ready);
