@@ -15,13 +15,25 @@ export function SectorName({ sector }: { sector: Sector }) {
   };
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger
-        className="cursor-help rounded-sm text-left underline decoration-subtle-foreground/70 decoration-dotted underline-offset-[3px] hover:decoration-foreground"
-        onMouseEnter={() => hover(true)}
-        onMouseLeave={() => hover(false)}
-        aria-label={`${sector.label}: Energinet's Danish name`}
-      >
-        {sector.label}
+      {/* An inline span, not a <button>: a button is laid out as an inline block, so a label this long would break
+          out of the sentence on a phone instead of wrapping with it. */}
+      <Popover.Trigger asChild>
+        <span
+          role="button"
+          tabIndex={0}
+          className="cursor-help rounded-sm underline decoration-subtle-foreground/70 decoration-dotted underline-offset-[3px] hover:decoration-foreground"
+          onMouseEnter={() => hover(true)}
+          onMouseLeave={() => hover(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setOpen((o) => !o);
+            }
+          }}
+          aria-label={`${sector.label}: Energinet's Danish name`}
+        >
+          {sector.label}
+        </span>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
